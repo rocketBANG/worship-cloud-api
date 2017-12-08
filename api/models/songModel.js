@@ -7,18 +7,16 @@ var Schema = mongoose.Schema;
 var SongSchema = new Schema({
     name: {
         type: String,
-        required: 'Kindly enter the name of the task'
+        required: 'Songs need a unique name',
+        index: true,
+        unique: true
     },
-    Created_date: {
-        type: Date,
-        default: Date.now
+    title: String,
+    verses: {
+        type: [String],
     },
-    status: {
-        type: [{
-            type: String,
-            enum: ['pending', 'ongoing', 'completed']
-        }],
-        default: ['pending']
+    order: {
+        type: [String],
     }
 });
 

@@ -1,13 +1,13 @@
-module.exports = function (app) {
-    var song = require('../controllers/songController');
+var song = require('../controllers/songController');
 
-    // todoList Routes
+module.exports = function (app) {   
+      
     app.route('/songs')
         .get(song.list_all_songs)
         .post(song.create_a_song);
 
 
-    app.route('/songs/:songId')
+    app.route('/songs/:songName')
         .get(song.read_a_song)
         .put(song.update_a_song)
         .delete(song.delete_a_song);

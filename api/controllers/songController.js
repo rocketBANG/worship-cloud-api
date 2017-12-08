@@ -1,5 +1,5 @@
-var mongoose = require('mongoose'),
-    Song = mongoose.model('Songs');
+var mongoose = require('mongoose');
+var Song = mongoose.model('Songs');
 
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
@@ -19,15 +19,16 @@ exports.create_a_song = function (req, res) {
 };
 
 exports.read_a_song = function (req, res) {
-    Song.findById(req.params.songId, function (err, song) {
-        if (err)
+    Song.findOne({ name: req.params.songName }, function (err, song) {
+        if (err) {
             res.send(err);
+        }
         res.json(song);
     });
 };
 
 exports.update_a_song = function (req, res) {
-    Song.findOneAndUpdate({ _id: req.params.songId }, req.body, { new: true }, function (err, song) {
+    Song.findOneAndUpdate({ name: req.params.songName }, req.body, { new: true }, function (err, song) {
         if (err)
             res.send(err);
         res.json(song);
@@ -37,7 +38,7 @@ exports.update_a_song = function (req, res) {
 exports.delete_a_song = function (req, res) {
 
     Song.remove({
-        _id: req.params.songId
+        name: req.params.songName
     }, function (err, song) {
         if (err)
             res.send(err);
