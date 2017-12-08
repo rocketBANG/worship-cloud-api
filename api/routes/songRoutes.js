@@ -10,5 +10,6 @@ module.exports = function (app) {
     app.route('/songs/:songName')
         .get(song.read_a_song)
         .put(song.update_a_song)
-        .delete(song.delete_a_song);
+        .delete(song.delete_a_song)
+        .patch(song.update_a_song);        
 };

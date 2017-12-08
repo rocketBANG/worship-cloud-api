@@ -28,7 +28,7 @@ exports.create_a_verse = function (req, res) {
 };
 
 exports.read_a_verse = function (req, res) {
-    Verse.findOne({ verseId: req.params.verseId }, function (err, verse) {
+    Verse.findOne({ id: req.params.verseId }, function (err, verse) {
         if (err) {
             res.status(505).json({ error: "error" });
         }
@@ -41,7 +41,7 @@ exports.read_a_verse = function (req, res) {
 };
 
 exports.update_a_verse = function (req, res) {
-    Verse.findOneAndUpdate({ verseId: req.params.verseId }, req.body, { new: false }, function (err, verse) {
+    Verse.findOneAndUpdate({ id: req.params.verseId }, req.body, { new: true }, function (err, verse) {
         if (err)
             res.send(err);
         res.json(verse);
@@ -51,7 +51,7 @@ exports.update_a_verse = function (req, res) {
 exports.delete_a_verse = function (req, res) {
 
     Verse.remove({
-        verseId: req.params.verseId
+        id: req.params.verseId
     }, function (err, verse) {
         if (err)
             res.send(err);

@@ -12,7 +12,7 @@ var VerseSchema = new Schema({
     },
     text: {
         type: String,
-        required: 'Verses need text',
+        default: ''
     },
     type: {
         type: String,
