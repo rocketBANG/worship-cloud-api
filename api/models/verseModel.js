@@ -18,6 +18,10 @@ var VerseSchema = new Schema({
         type: String,
         enum: ['verse', 'chorus'],
         default: 'verse'
+    },
+    songName: {
+        type: String,
+        required: 'Verses need a parent song'
     }
 });
 

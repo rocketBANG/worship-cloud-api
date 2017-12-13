@@ -1,8 +1,17 @@
 var mongoose = require('mongoose');
 var Song = mongoose.model('Songs');
+var Verse = mongoose.model('Verses');
 
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
+        if (err)
+            res.send(err);
+        res.json(song);
+    });
+};
+
+exports.list_all_verses = function (req, res) {
+    Verse.find({songName: req.params.songName}, function (err, song) {
         if (err)
             res.send(err);
         res.json(song);
