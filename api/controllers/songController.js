@@ -11,11 +11,30 @@ exports.list_all_songs = function (req, res) {
 };
 
 exports.list_all_verses = function (req, res) {
-    Verse.find({songName: req.params.songName}, function (err, song) {
+    var verseList;
+    var songOrder;
+
+    let versePromise = Verse.find({songName: req.params.songName}, function (err, verses) {
         if (err)
             res.send(err);
-        res.json(song);
+        verseList = verses;
+    }).then();
+
+    let songPromise = Song.findOne({ name: req.params.songName }, function (err, song) {
+        if (err) {
+            res.send(err);
+        }
+        songOrder = song.order;
+    }).then();
+
+    Promise.all([songPromise, versePromise]).then(() => {
+        let result = {
+            verses: verseList,
+            order: songOrder,
+        }
+        res.json(result);
     });
+
 };
 
 exports.create_a_song = function (req, res) {
@@ -49,6 +68,15 @@ exports.delete_a_song = function (req, res) {
     Song.remove({
         name: req.params.songName
     }, function (err, song) {
+        if (err)
+            res.send(err);
+        res.json({ message: 'Song successfully deleted' });
+    });
+};
+
+exports.delete_all_songs = function (req, res) {
+
+    Song.remove({}, function (err, song) {
         if (err)
             res.send(err);
         res.json({ message: 'Song successfully deleted' });

@@ -4,7 +4,8 @@ module.exports = function (app) {
       
     app.route('/songs')
         .get(song.list_all_songs)
-        .post(song.create_a_song);
+        .post(song.create_a_song)
+        .delete(song.delete_all_songs);
 
 
     app.route('/songs/:songName')
