@@ -15,5 +15,6 @@ module.exports = function (app) {
         .patch(song.update_a_song);
         
     app.route('/songs/:songName/verses')
-        .get(song.list_all_verses);
+        .get(song.list_all_verses)
+        .post(song.create_a_verse);
 };

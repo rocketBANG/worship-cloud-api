@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Verse = mongoose.model('Verses');
+var Song = mongoose.model('Songs');
 
 exports.list_all_verses = function (req, res) {
     Verse.find({}, function (err, verse) {
@@ -49,12 +50,39 @@ exports.update_a_verse = function (req, res) {
 };
 
 exports.delete_a_verse = function (req, res) {
+    Verse.findOne({id: req.params.verseId}, function(err, verse) {
 
-    Verse.remove({
-        id: req.params.verseId
-    }, function (err, verse) {
-        if (err)
-            res.send(err);
-        res.json({ message: 'Verse successfully deleted' });
+        Verse.remove({
+            id: req.params.verseId
+        }, function (err) {
+            if (err)
+            {
+                res.send(err);
+            } 
+            Song.findOne({ name: verse.songName }, function (err, song) {
+                if (err) {
+                    res.send(err);
+                }
+                deleteVerse(song, req.params.verseId, res)
+            });
+        });
+    })
+}; 
+
+const deleteVerse = (song, verseId, res) => {
+    var newVerses = song.verses.filter((verse, index) => {
+        return verse !== verseId;
     });
-};
+
+    var newOrder = song.order.filter((verse, index) => {
+        return verse !== verseId;
+    });
+
+    Song.findOneAndUpdate({ name: song.name }, {verses: newVerses, order: newOrder}, function(err, song) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json({ message: 'Verse successfully deleted' });
+        }
+    });
+}

@@ -82,3 +82,38 @@ exports.delete_all_songs = function (req, res) {
         res.json({ message: 'Song successfully deleted' });
     });
 };
+
+exports.create_a_verse = function(req, res) {
+    Verse.findOne({}, {}, { sort: {id : -1 }}, function(err, verse) {
+        let verseId = "v0";
+        if(verse != null) {
+            let maxId = parseInt(verse.id.replace("v", ""), 10) + 1;
+            verseId = "v" + maxId;    
+        }
+        Song.findOne({ name: req.params.songName }, function (err, song) {
+            if (err) {
+                res.send(err);
+            }
+            Song.findOneAndUpdate({ name: req.params.songName }, {
+                verses: song.verses.concat(verseId)
+                
+            }, function(err, song) {
+                if (err) {
+                    res.send(err);
+                }
+                var newVerse = new Verse({
+                    id: verseId, 
+                    text: req.text,
+                    type: req.type,
+                    songName: req.params.songName
+                });
+                newVerse.save(function(err, verse) {
+                    if (err) {
+                        res.send(err);
+                    }
+                    res.json(verse);
+                });
+            });
+        });
+    })
+}
