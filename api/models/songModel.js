@@ -17,6 +17,9 @@ var SongSchema = new Schema({
     },
     order: {
         type: [String],
+    },
+    chorus: {
+        type: String,
     }
 });
 

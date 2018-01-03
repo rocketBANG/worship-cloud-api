@@ -17,4 +17,8 @@ module.exports = function (app) {
     app.route('/songs/:songName/verses')
         .get(song.list_all_verses)
         .post(song.create_a_verse);
+
+    app.route('/songs/:songName/chorus')
+        .post(song.create_a_chorus);
+
 };
