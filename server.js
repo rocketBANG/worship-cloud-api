@@ -23,8 +23,13 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, PUT, DELETE, HEAD, POST, PATCH");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
-  });
-  
+});
+
+app.use(function (err, req, res, next) {
+    console.error(err.stack)
+    res.status(500).send('Something broke!')
+})
+
 
 var routes = require('./api/routes/routes'); //importing route
 routes(app); //register the route
