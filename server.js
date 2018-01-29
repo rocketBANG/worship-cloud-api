@@ -8,11 +8,7 @@ var bodyParser = require('body-parser');
 var {user, pass} = require('./auth');
 
 mongoose.Promise = global.Promise;
-let mongooseOptions = {
-    useMongoClient: true,
-    autoIndex: false
-}
-mongoose.connect('mongodb://' + user + ':' + pass + '@worshipcloud-shard-00-02-trnrb.mongodb.net:27017/songs?ssl=true&authSource=admin');
+mongoose.connect('mongodb://' + user + ':' + pass + '@worshipcloud-shard-00-02-trnrb.mongodb.net:27017/songs?ssl=true&authSource=admin', {useMongoClient: true});
 
  
 app.use(bodyParser.urlencoded({ extended: true }));
