@@ -26,8 +26,9 @@ exports.list_all_verses = function (req, res) {
 exports.create_a_song = function (req, res) {
     var new_song = new Song(req.body);
     new_song.save(function (err, song) {
-        if (err)
-            res.send(err);
+        if (err) {
+            res.status(500).send(err);
+        }
         res.json(song);
     });
 };
