@@ -1,24 +1,26 @@
 var song = require('../controllers/songController');
+var fs = require('fs');
+var {baseUrl} = JSON.parse(fs.readFileSync('setup.json', 'utf8'));
 
 module.exports = function (app) {   
       
-    app.route('/songs')
+    app.route(baseUrl + '/songs')
         .get(song.list_all_songs)
         .post(song.create_a_song)
         .delete(song.delete_all_songs);
 
 
-    app.route('/songs/:songName')
+    app.route(baseUrl + '/songs/:songName')
         .get(song.read_a_song)
         .put(song.update_a_song)
         .delete(song.delete_a_song)
         .patch(song.update_a_song);
         
-    app.route('/songs/:songName/verses')
+    app.route(baseUrl + '/songs/:songName/verses')
         .get(song.list_all_verses)
         .post(song.create_a_verse);
 
-    app.route('/songs/:songName/chorus')
+    app.route(baseUrl + '/songs/:songName/chorus')
         .post(song.create_a_chorus);
 
 };

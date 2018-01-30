@@ -1,3 +1,4 @@
 {
-    "authFile": "auth.json"
+    "authFile": "auth.json",
+    "baseUrl": ""
 }
