@@ -1,6 +1,5 @@
 var verse = require('../controllers/verseController');
-var fs = require('fs');
-var {baseUrl} = JSON.parse(fs.readFileSync('setup.json', 'utf8'));
+var baseUrl = process.env.BASE_URL;
 
 module.exports = function (app) {   
       

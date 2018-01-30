@@ -1,9 +1,8 @@
 var song = require('../controllers/songController');
-var fs = require('fs');
-var {baseUrl} = JSON.parse(fs.readFileSync('setup.json', 'utf8'));
+var baseUrl = process.env.BASE_URL;
 
 module.exports = function (app) {   
-      
+
     app.route(baseUrl + '/songs')
         .get(song.list_all_songs)
         .post(song.create_a_song)
