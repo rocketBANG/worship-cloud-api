@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Song = mongoose.model('Songs');
 var Verse = mongoose.model('Verses');
+var {SocketManager} = require('../SocketManager');
 
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
@@ -25,6 +26,7 @@ exports.list_all_verses = function (req, res) {
 
 exports.create_a_song = function (req, res) {
     var new_song = new Song(req.body);
+    SocketManager.getManager().updateClients('newDataEvent', {action: 'createSong', data: new_song});
     new_song.save(function (err, song) {
         if (err) {
             res.status(500).send(err);

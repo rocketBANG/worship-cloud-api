@@ -1,5 +1,5 @@
 var song = require('../controllers/songController');
-var baseUrl = process.env.BASE_URL;
+let baseUrl = process.env.BASE_URL || '';
 
 module.exports = function (app) {   
 
