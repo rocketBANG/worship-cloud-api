@@ -10,12 +10,16 @@ class SocketManager {
         this.io = io;
 
         io.on('connection', (client) => {
-            console.log(client);
             client.on('subscribeEvent', (interval) => {
                 this.clientList.push(client);
-                console.log('client is subscribed ', interval);
-            });
-        });
+    })
+    
+        // Remove on disconnect
+            client.on('disconnect', () => {
+                let i = this.clientList.indexOf(client);
+                this.clientList.splice(i, 1);
+            })
+    })
     }
 
     updateClients(event, data) {

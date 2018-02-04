@@ -6,7 +6,7 @@ module.exports = function (app) {
       
     app.route(baseUrl + '/verses')
         .get(verse.list_all_verses)
-        .post(verse.create_a_verse)
+        .post(verse.create_a_verse);
         // .delete(verse.delete_all_verses);
 
 

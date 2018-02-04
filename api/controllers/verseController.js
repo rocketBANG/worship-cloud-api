@@ -17,7 +17,7 @@ exports.delete_all_verses = function(req, res) {
         }
         res.json({ message: 'All verses deleted' });
     });
-}
+};
 
 exports.create_a_verse = function (req, res) {
     var new_verse = new Verse(req.body);
@@ -72,12 +72,10 @@ exports.delete_a_verse = function (req, res) {
 const deleteVerse = (song, verseId, res) => {
     var newVerses = song.verses.filter((verse, index) => {
         return verse !== verseId;
-    });
-
+})
     var newOrder = song.order.filter((verse, index) => {
         return verse !== verseId;
-    });
-
+})
     Song.findOneAndUpdate({ name: song.name }, {verses: newVerses, order: newOrder}, function(err, song) {
         if (err) {
             res.send(err);

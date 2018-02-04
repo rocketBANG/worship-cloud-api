@@ -20,18 +20,17 @@ exports.list_all_verses = function (req, res) {
             order: song.order,
         }
         res.json(result);
-    });
-
+})
 };
 
 exports.create_a_song = function (req, res) {
     var new_song = new Song(req.body);
-    SocketManager.getManager().updateClients('newDataEvent', {action: 'createSong', data: new_song});
     new_song.save(function (err, song) {
         if (err) {
             res.status(500).send(err);
         }
         res.json(song);
+        SocketManager.getManager().updateClients('newDataEvent', {action: 'createSong', data: new_song});
     });
 };
 
@@ -57,9 +56,11 @@ exports.delete_a_song = function (req, res) {
     Song.remove({
         name: req.params.songName
     }, function (err, song) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
         res.json({ message: 'Song successfully deleted' });
+        SocketManager.getManager().updateClients('newDataEvent', {action: 'removeSong', data: {name: req.params.songName}});
     });
 };
 
@@ -106,7 +107,7 @@ exports.create_a_verse = function(req, res) {
             });
         });
     })
-}
+};
 
 exports.create_a_chorus = function(req, res) {
     Verse.findOne({}, {}, { sort: {id : -1 }}, function(err, verse) {
@@ -142,4 +143,4 @@ exports.create_a_chorus = function(req, res) {
             });
         });
     })
-}
+};

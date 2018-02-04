@@ -33,9 +33,9 @@ app.use(function(req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-    console.error(err.stack)
+    console.error(err.stack);
     res.status(500).send('Something broke!')
-})
+});
 
 var routes = require('./api/routes/routes'); //importing route
 routes(app); //register the route
