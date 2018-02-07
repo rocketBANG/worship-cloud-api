@@ -7,11 +7,6 @@ var bodyParser = require('body-parser');
 var socketIo = require('socket.io');
 var { SocketManager } = require('./api/SocketManager');
 
-let io = socketIo(http.createServer(app));
-const socketPort = 8000;
-io.listen(socketPort);
-SocketManager.getManager().setSocketIO(io);
-
 var app = express();
 var port = process.env.PORT || 3500;
 var router = express.Router();
@@ -45,9 +40,12 @@ app.use(function (err, req, res, next) {
 var routes = require('./api/routes/routes'); //importing route
 routes(app); //register the route
 
-app.listen(port, function () {
+let server = app.listen(port, function () {
     console.log('Example app listening on port 3500!');
 });  
+
+let io = socketIo().listen(server);
+SocketManager.getManager().setSocketIO(io);
 
 
 module.exports = router;
