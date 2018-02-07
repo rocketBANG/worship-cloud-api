@@ -1,5 +1,3 @@
-//@ts-check
-
 require('dotenv').load();
 var express = require('express');
 var http = require('http');
@@ -24,8 +22,15 @@ mongoose.connect('mongodb://' + process.env.DBUSER + ':' + process.env.DBPASS + 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const origins = ["https://worshipcloud.azurewebsites.net", "http://localhost:3000"];
+
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://worshipcloud.azurewebsites.net");
+    let origin = origins.indexOf(req.headers.origin.toLowerCase()) > - 1 ? req.headers.origin : origins[0];
+    res.header("Access-Control-Allow-Origin", origin);
+    next();
+});
+
+app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, PUT, DELETE, HEAD, POST, PATCH");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Credentials", "true");
