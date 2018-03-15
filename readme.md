@@ -6,7 +6,7 @@ DBUSER=
 DBPASS=
 DBURL=
 ```
-`BASE_URL` is the url the api will be hosted at  
+`BASE_URL` is the url the api will be hosted at (e.g. `/api/v1`)  
 `DBUSER` is the username to login to the database with
     (leave blank if there is no auth)  
 `DBPASS` is the password to use for the database 
@@ -17,3 +17,8 @@ DBURL=
     
 `.env.production` Handles what config the program uses in a production enviroment  
 `.env` Handles what the program uses in a dev enviroment
+
+## Running
+Run the command `npm start`  
+This will start a localhost server at port 3500.  
+Changing files will cause the server to reload automatically with the new changes
