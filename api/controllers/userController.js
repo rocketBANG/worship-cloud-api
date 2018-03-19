@@ -8,9 +8,10 @@ exports.getSettings = function(req, res) {
     })
 }
 
-exports.patchSettings = function(req, res) {
+exports.patchSettings = async function(req, res) {
+    let user = await Users.findOne({username: req.params.username});
     Users.findOneAndUpdate({ username: req.params.username },
-        {settings: req.body}, { new: true }, function (err, song) {
+        {settings: Object.assign(user.settings, req.body)}, { new: true }, (err, song) => {
         if (err) res.send(err);
         res.json(song);
     });
