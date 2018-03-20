@@ -20,7 +20,10 @@ app.use(bodyParser.json());
 const origins = ["https://worshipcloud.azurewebsites.net", "http://localhost:3000"];
 
 app.use(function(req, res, next) {
-    let origin = origins.indexOf(req.headers.origin.toLowerCase()) > - 1 ? req.headers.origin : origins[0];
+    let origin = req.headers.origin && origins.indexOf(req.headers.origin.toLowerCase()) > - 1 
+        ? req.headers.origin 
+        : origins[0];
+    console.log(origin);
     res.header("Access-Control-Allow-Origin", origin);
     next();
 });
