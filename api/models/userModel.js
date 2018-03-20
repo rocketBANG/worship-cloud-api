@@ -19,7 +19,8 @@ var UserSchema = new Schema({
         topMargin: Number,
         leftMargin: Number,
         rightMargin: Number,
-        bottomMargin: Number,
+        titleMargin: Number,
+        indentAmount: Number
     }
 });
 
