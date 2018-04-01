@@ -1,0 +1,20 @@
+<a:p>
+    <a:pPr algn="l">
+        <a:buFont typeface="Wingdings 2" pitchFamily="18" charset="2"/>
+        <a:buNone/>
+        <a:defRPr/>
+    </a:pPr>
+    <a:r>
+        <a:rPr lang="en-NZ" sz="4400" dirty="0">
+            <a:latin typeface="Arial" panose="020B0604020202020204" pitchFamily="34" charset="0"/>
+            <a:ea typeface="Verdana" panose="020B0604030504040204" pitchFamily="34" charset="0"/>
+            <a:cs typeface="Arial" panose="020B0604020202020204" pitchFamily="34" charset="0"/>
+        </a:rPr>
+        <a:t>%WORD%</a:t>
+    </a:r>
+    <a:endParaRPr lang="en-US" sz="4400" dirty="0">
+        <a:latin typeface="Arial" panose="020B0604020202020204" pitchFamily="34" charset="0"/>
+        <a:ea typeface="Verdana" panose="020B0604030504040204" pitchFamily="34" charset="0"/>
+        <a:cs typeface="Arial" panose="020B0604020202020204" pitchFamily="34" charset="0"/>
+    </a:endParaRPr>
+</a:p>

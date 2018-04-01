@@ -8,6 +8,8 @@ module.exports = function (app) {
         .post(song.create_a_song)
         .delete(song.delete_all_songs);
 
+    app.route(baseUrl + '/songpptx/:songName')
+        .get(song.download_a_song);
 
     app.route(baseUrl + '/songs/:songName')
         .get(song.read_a_song)

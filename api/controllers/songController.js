@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Song = mongoose.model('Songs');
 var Verse = mongoose.model('Verses');
 var {SocketManager} = require('../SocketManager');
+const fs = require('fs');
 
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
@@ -108,6 +109,39 @@ exports.create_a_verse = function(req, res) {
         });
     })
 };
+
+exports.download_a_song = async function(req, res) {
+    let allVerses = await Verse.find({songName: req.params.songName});
+
+    let titleSlideContents = fs.readFileSync('docs/pptx-title-slide.xml').toString();
+    let verseSlideContents = fs.readFileSync('docs/pptx-word-slide.xml').toString();
+    // console.log(titleSlideContents);
+ 
+    let defaultParagraph = fs.readFileSync('docs/pptx-paragraph.xml').toString();
+
+    let slides = [];
+
+    allVerses.forEach((verse, i) => {
+        let paragraphs = "";
+        let slideContents = verseSlideContents;
+        if(i === 0) {
+            slideContents = titleSlideContents.replace("%TITLE%", req.params.songName);
+        }
+        
+        verse.text.split("\n").forEach(line => {
+            if(line !== "") {
+                paragraphs += defaultParagraph.replace("%WORD%", line);
+            }
+        });
+        let slide = slideContents.replace("%PARAGRAPHS%", paragraphs);
+        slides.push(slide);
+        fs.writeFileSync("tmp/slide" + (i + 1) + ".xml", slide);
+    });
+
+
+
+    
+}
 
 exports.create_a_chorus = function(req, res) {
     Verse.findOne({}, {}, { sort: {id : -1 }}, function(err, verse) {
