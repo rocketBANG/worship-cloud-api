@@ -10,7 +10,10 @@ var SongListSchema = new Schema({
         index: true,
         unique: true
     },
-    songs: [String],
+    songs: [{
+        name: String,
+        title: String  
+    }],
     name: String
 });
 
