@@ -3,6 +3,7 @@ const { PPTXExporter } = require('../pptx/pptxExporter');
 var mongoose = require('mongoose');
 var Song = mongoose.model('Songs');
 var Verse = mongoose.model('Verses');
+const SongList = mongoose.model('SongLists');
 var {SocketManager} = require('../SocketManager');
 
 exports.list_all_songs = function (req, res) {
@@ -75,40 +76,34 @@ exports.delete_all_songs = function (req, res) {
     });
 };
 
-exports.create_a_verse = function(req, res) {
-    Verse.findOne({}, {}, { sort: {id : -1 }}, function(err, verse) {
-        let verseId = "v0000";
-        if(verse != null) {
-            let maxId = parseInt(verse.id.replace("v", ""), 10) + 1;
-            verseId = "v" + String('00000'+maxId).slice(-4);
+exports.create_a_verse = async function(req, res) {
+    let verseId = await generateNewId("v", Verse);
+    Song.findOne({ name: req.params.songName }, function (err, song) {
+        if (err) {
+            res.send(err);
         }
-        Song.findOne({ name: req.params.songName }, function (err, song) {
+        Song.findOneAndUpdate({ name: req.params.songName }, {
+            verses: song.verses.concat(verseId)
+            
+        }, function(err, song) {
             if (err) {
                 res.send(err);
             }
-            Song.findOneAndUpdate({ name: req.params.songName }, {
-                verses: song.verses.concat(verseId)
-                
-            }, function(err, song) {
+
+            var newVerse = new Verse({
+                id: verseId, 
+                text: req.body.text,
+                type: req.body.type,
+                songName: req.params.songName
+            });
+            newVerse.save(function(err, verse) {
                 if (err) {
                     res.send(err);
                 }
-
-                var newVerse = new Verse({
-                    id: verseId, 
-                    text: req.body.text,
-                    type: req.body.type,
-                    songName: req.params.songName
-                });
-                newVerse.save(function(err, verse) {
-                    if (err) {
-                        res.send(err);
-                    }
-                    res.json(verse);
-                });
+                res.json(verse);
             });
         });
-    })
+    });
 };
 
 exports.download_a_song = async function(req, res) {
@@ -145,38 +140,74 @@ exports.download_songs = async function(req, res) {
 
 }
 
-exports.create_a_chorus = function(req, res) {
-    Verse.findOne({}, {}, { sort: {id : -1 }}, function(err, verse) {
-        let verseId = "v0";
-        if(verse != null) {
-            let maxId = parseInt(verse.id.replace("v", ""), 10) + 1;
-            verseId = "v" + maxId;    
+exports.create_a_chorus = async function(req, res) {
+    verseId = await generateNewId("v", Verse);
+    Song.findOne({ name: req.params.songName }, function (err, song) {
+        if (err) {
+            res.send(err);
         }
-        Song.findOne({ name: req.params.songName }, function (err, song) {
+        Song.findOneAndUpdate({ name: req.params.songName }, {
+            chorus: verseId
+            
+        }, function(err, song) {
             if (err) {
                 res.send(err);
             }
-            Song.findOneAndUpdate({ name: req.params.songName }, {
-                chorus: verseId
-                
-            }, function(err, song) {
+
+            var newVerse = new Verse({
+                id: verseId, 
+                text: req.body.text,
+                type: req.body.type,
+                songName: req.params.songName
+            });
+            newVerse.save(function(err, verse) {
                 if (err) {
                     res.send(err);
                 }
-
-                var newVerse = new Verse({
-                    id: verseId, 
-                    text: req.body.text,
-                    type: req.body.type,
-                    songName: req.params.songName
-                });
-                newVerse.save(function(err, verse) {
-                    if (err) {
-                        res.send(err);
-                    }
-                    res.json(verse);
-                });
+                res.json(verse);
             });
         });
-    })
+    });
 };
+
+exports.get_all_lists = async function(req, res) {
+    const songLists = await SongList.find({});
+    res.json(songLists);
+}
+
+exports.get_a_list = async function(req, res) {
+    const songList = await SongList.findOne({id: req.params.listId});
+    res.json(songList);
+}
+
+exports.create_a_list = async function(req, res) {
+    let songListObj = {...req.body, id: await generateNewId("s", SongList)};
+    let newList = new SongList(songListObj);
+    let list = await newList.save();
+
+    res.json(newList);
+}
+
+exports.update_a_list = async function(req, res) {
+    let newList = await SongList.findOneAndUpdate({id: req.params.listId}, {songs: req.body.songs}, { new: true });
+
+    res.json(newList);
+}
+
+exports.delete_a_list = async function(req, res) {
+    SongList.findOneAndRemove({id: req.params.listId}).then(
+        res => { res.json({message: "deleted"}) },
+        err => { res.send(err) }
+    );
+    
+}
+
+const generateNewId = async (prefix, DBSchema, idName = "id") => {
+    let index = prefix + "0";
+    let maxIndex = await DBSchema.findOne({}, {}, {sort: {id: -1}});
+    if(maxIndex !== null) {
+        let maxId = parseInt(maxIndex[idName].replace(prefix, ""), 10) + 1;
+        index = prefix + maxId;    
+    }
+    return index;
+}
