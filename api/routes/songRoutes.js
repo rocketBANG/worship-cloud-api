@@ -22,4 +22,11 @@ module.exports = function (app) {
     app.route(baseUrl + '/songs/:songName/chorus')
         .post(song.create_a_chorus);
 
+    app.route(baseUrl + '/songlists')
+        .get(song.get_all_lists)
+        .post(song.create_a_list);
+        
+    app.route(baseUrl + '/songlists/:listId')
+        .patch(song.update_a_list)
+        .delete(song.delete_a_list);
 };

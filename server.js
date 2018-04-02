@@ -23,7 +23,6 @@ app.use(function(req, res, next) {
     let origin = req.headers.origin && origins.indexOf(req.headers.origin.toLowerCase()) > - 1 
         ? req.headers.origin 
         : origins[0];
-    console.log(origin);
     res.header("Access-Control-Allow-Origin", origin);
     next();
 });
