@@ -139,16 +139,21 @@ exports.get_all_lists = async function(req, res) {
     res.json(songLists);
 }
 
+exports.get_a_list = async function(req, res) {
+    const songList = await SongList.findOne({id: req.params.listId});
+    res.json(songList);
+}
+
 exports.create_a_list = async function(req, res) {
     let songListObj = {...req.body, id: await generateNewId("s", SongList)};
     let newList = new SongList(songListObj);
     let list = await newList.save();
 
-    res.json(list);
+    res.json(newList);
 }
 
 exports.update_a_list = async function(req, res) {
-    let newList = await SongList.findOneAndUpdate({id: req.params.listId}, {songs: req.body});
+    let newList = await SongList.findOneAndUpdate({id: req.params.listId}, {songs: req.body.songs}, { new: true });
 
     res.json(newList);
 }

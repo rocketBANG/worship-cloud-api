@@ -27,6 +27,7 @@ module.exports = function (app) {
         .post(song.create_a_list);
         
     app.route(baseUrl + '/songlists/:listId')
+        .get(song.get_a_list)
         .patch(song.update_a_list)
         .delete(song.delete_a_list);
 };
