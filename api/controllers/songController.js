@@ -122,18 +122,18 @@ exports.download_a_song = async function(req, res) {
 }
 
 exports.download_songs = async function(req, res) {
-    let songNames = req.body.songs;
+    let songNames = req.body;
 
     const exporter = new PPTXExporter();
 
-    await songNames.forEach(async s => {
-        let allVerses = await Verse.find({songName: s});
-        await exporter.addSong(s, allVerses);
-    });
+    for(let i = 0; i < songNames.length; i++) {
+        let allVerses = await Verse.find({songName: songNames[i]});
+        await exporter.addSong(songNames[i], allVerses);
+    }
 
     res.writeHead(200, {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'Content-disposition': 'attachment; filename=' + songName[0] + '.pptx'
+        'Content-disposition': 'attachment; filename=' + songNames[0] + '.pptx'
     });
 
     await exporter.exportPPTX(res);

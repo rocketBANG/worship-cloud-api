@@ -5,25 +5,32 @@ const rimraf = require('rimraf');
 
 exports.PPTXExporter = class PPTXExporter { 
     constructor() {
-        this.setupPromise = this.setup();
+        this.isLoaded = false;
     }
 
     async setup() {
         this.folderName = "tmp_" + new Date().toISOString() + Math.random();
+        this.folderName = this.folderName.replace(/\./g, "-");
+        this.folderName = this.folderName.replace(/:/g, "-");
         let folderName = this.folderName;
-        folderName = folderName.replace(/\./g, "-");
-        folderName = folderName.replace(/:/g, "-");
 
-        await decompress('docs/pptx-default.zip', folderName);
+        let test = await decompress('docs/pptx-default.zip', folderName);
 
         this.slideIds = "";
         this.slideRels = "";
         this.slideContentTypes = "";
         this.maxId = 1;
+
+        return test;
     }
 
     async addSong(songName, verses) {
-        await this.setupPromise;
+        if(!this.isLoaded) {
+            await this.setup();
+            this.isLoaded = true;
+        }
+        let folderName = this.folderName;
+
         let titleSlideContents = fs.readFileSync('docs/pptx-title-slide.xml').toString();
         let verseSlideContents = fs.readFileSync('docs/pptx-word-slide.xml').toString();
         let defaultParagraph = fs.readFileSync('docs/pptx-paragraph.xml').toString();
@@ -61,6 +68,8 @@ exports.PPTXExporter = class PPTXExporter {
 
     async exportPPTX(response) {
         await this.setupPromise;
+        let folderName = this.folderName;
+
         let presentationRels = fs.readFileSync('docs/pptx-presentation-rels.xml').toString();
         let presentation = fs.readFileSync('docs/pptx-presentation.xml').toString();
 
