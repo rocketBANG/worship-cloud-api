@@ -11,6 +11,9 @@ module.exports = function (app) {
     app.route(baseUrl + '/songpptx/:songName')
         .get(song.download_a_song);
 
+    app.route(baseUrl + '/songpptx')
+        .post(song.download_songs);
+
     app.route(baseUrl + '/songs/:songName')
         .get(song.read_a_song)
         .put(song.update_a_song)

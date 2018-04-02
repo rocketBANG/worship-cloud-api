@@ -121,8 +121,28 @@ exports.download_a_song = async function(req, res) {
     });
 
     const exporter = new PPTXExporter();
-    exporter.exportPPTX(songName, allVerses, res);
+    await exporter.addSong(songName, allVerses);
+    await exporter.exportPPTX(res);
     
+}
+
+exports.download_songs = async function(req, res) {
+    let songNames = req.body.songs;
+
+    const exporter = new PPTXExporter();
+
+    await songNames.forEach(async s => {
+        let allVerses = await Verse.find({songName: s});
+        await exporter.addSong(s, allVerses);
+    });
+
+    res.writeHead(200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'Content-disposition': 'attachment; filename=' + songName[0] + '.pptx'
+    });
+
+    await exporter.exportPPTX(res);
+
 }
 
 exports.create_a_chorus = function(req, res) {
