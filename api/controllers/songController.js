@@ -203,11 +203,11 @@ exports.delete_a_list = async function(req, res) {
 }
 
 const generateNewId = async (prefix, DBSchema, idName = "id") => {
-    let index = prefix + "0";
+    let index = prefix + "00000";
     let maxIndex = await DBSchema.findOne({}, {}, {sort: {id: -1}});
     if(maxIndex !== null) {
         let maxId = parseInt(maxIndex[idName].replace(prefix, ""), 10) + 1;
-        index = prefix + maxId;    
+        index = prefix + String('000000'+maxId).slice(-5);    
     }
     return index;
 }
