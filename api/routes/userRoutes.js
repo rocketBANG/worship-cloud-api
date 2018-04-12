@@ -9,5 +9,6 @@ module.exports = function (app) {
 
 module.exports = function (app) {   
     app.route(baseUrl + '/login/:username')
-        .post(userController.loginUser);
+        .post(userController.loginUser)
+        // .patch(userController.updatePass);
 }
