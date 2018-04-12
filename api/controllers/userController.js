@@ -8,6 +8,15 @@ exports.getSettings = function(req, res) {
     })
 }
 
+exports.loginUser = async function(req, res) {
+    const user = await Users.findOne({username: req.params.username});
+    if(user !== null && user.password === req.body.password) {
+        res.json({key: user.username + "key", success: true});
+    } else {
+        res.json({success: false});
+    }
+}
+
 exports.patchSettings = async function(req, res) {
     let user = await Users.findOne({username: req.params.username});
     Users.findOneAndUpdate({ username: req.params.username },

@@ -10,6 +10,7 @@ var UserSchema = new Schema({
         index: true,
         unique: true
     },
+    password: String,
     settings: {
         wordFontSize: Number,
         titleFontSize: Number,
