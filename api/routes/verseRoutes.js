@@ -1,7 +1,6 @@
 var verse = require('../controllers/verseController');
 let baseUrl = process.env.BASE_URL;
 
-console.log(baseUrl);
 module.exports = function (app) {   
       
     app.route(baseUrl + '/verses')

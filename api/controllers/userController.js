@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Users = mongoose.model('Users');
 const bcrypt = require('bcrypt');
+const UserManager = require('../UserManager');
 
 exports.getSettings = function(req, res) {
     Users.find({username: req.params.username}, (err, user) => {
@@ -11,9 +12,10 @@ exports.getSettings = function(req, res) {
 
 exports.loginUser = async function(req, res) {
     const user = await Users.findOne({username: req.params.username});
-    let correct = await bcrypt.compare(req.body.password, user.password);
+    let correct = user !== null && await bcrypt.compare(req.body.password, user.password);
     
-    if(user !== null && correct) {
+    if(correct) {
+        UserManager.getObj().AddUser(user.username + "key", user.username);
         res.json({key: user.username + "key", success: true});
     } else {
         res.json({success: false});

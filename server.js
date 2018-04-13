@@ -1,3 +1,5 @@
+const UserManager = require('./api/UserManager');
+
 require('dotenv').load();
 var express = require('express');
 var http = require('http');
@@ -29,7 +31,7 @@ app.use(function(req, res, next) {
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, PUT, DELETE, HEAD, POST, PATCH");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, auth-token");
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
@@ -39,12 +41,34 @@ app.use(function (err, req, res, next) {
     res.status(500).send('Something broke!')
 });
 
+const uncheckedPaths = ["/login"];
+const uncheckedMethods = ["OPTIONS"];
+
+app.use(function(req, res, next) {
+    if(uncheckedPaths.findIndex(p => req.path.startsWith(p)) > -1) {
+        next();
+        return;
+    } 
+    if(req.method === "OPTIONS") {
+        res.send();
+        return;
+    }
+    let user = UserManager.getObj().VerifyUser(req.headers["auth-token"]);
+    if(user === undefined) {
+        res.statusCode = 401;
+        res.send();
+        return;
+    }
+    next();
+});
+
 var routes = require('./api/routes/routes'); //importing route
 routes(app); //register the route
 
 let server = app.listen(port, function () {
     console.log('Example app listening on port 3500!');
-});  
+});
+
 
 let io = socketIo().listen(server);
 SocketManager.getManager().setSocketIO(io);
