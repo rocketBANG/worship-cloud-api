@@ -5,15 +5,9 @@ var Schema = mongoose.Schema;
 
 
 var SongListSchema = new Schema({
-    id: {
-        type: String,
-        index: true,
-        unique: true
-    },
-    songs: [{
-        name: String,
-        title: String  
-    }],
+    songIds: [
+        String
+    ],
     name: String
 });
 
