@@ -13,9 +13,9 @@ exports.list_all_songs = function (req, res) {
     });
 };
 
-exports.list_all_verses = function (req, res) {
+exports.list_all_verses = async function (req, res) {
 
-    let song = Song.findById(req.params.songId);
+    let song = await Song.findById(req.params.songId);
     let result = {
         verses: song.verses,
         order: song.order,
@@ -73,15 +73,17 @@ exports.delete_all_songs = function (req, res) {
 exports.create_a_verse = async function(req, res) {
     let song = await Song.findById(req.params.songId);
 
-    song.verses.push({
+    let newVerse = song.verses.create({
         text: req.body.text,
         type: req.body.type,
     });
+    song.verses.push(newVerse);
+
     song.save(function(err, song) {
         if (err) {
             res.send(err);
         }
-        res.json(song);
+        res.json(newVerse);
     });
 };
 
@@ -159,8 +161,9 @@ exports.read_a_verse = async function (req, res) {
 exports.update_a_verse = async function (req, res) {
     let song = await Song.findById(req.params.songId);
     let verse =  song.verses.id(req.params.verseId);
-    verse.text = req.body.text;
-    await saveAndReturnJson(song);
+    verse.text = req.body.text || verse.text;
+    verse.type = req.body.type || verse.type;
+    await saveAndReturnJson(song, res);
 };
 
 exports.delete_a_verse = async function (req, res) {
@@ -174,7 +177,7 @@ exports.delete_a_verse = async function (req, res) {
     song.order = newOrder;
     verse.remove();
 
-    await saveAndReturnJson(song);
+    await saveAndReturnJson(song, res);
 }; 
 
 async function getVerseById(songId, verseId) {
@@ -182,7 +185,7 @@ async function getVerseById(songId, verseId) {
     return song.verses.id(verseId);
 }
 
-async function saveAndReturnJson(object) {
+async function saveAndReturnJson(object, res) {
     return new Promise((resolve, reject) => {
         object.save((err, objectResult) => {
             if (err) {
