@@ -1,8 +1,7 @@
 const { PPTXExporter } = require('../pptx/pptxExporter');
 
 var mongoose = require('mongoose');
-var Song = mongoose.model('Songs');
-var Verse = mongoose.model('Verses');
+const Song = require('../models/songModel');
 const SongList = mongoose.model('SongLists');
 var {SocketManager} = require('../SocketManager');
 
@@ -14,16 +13,14 @@ exports.list_all_songs = function (req, res) {
     });
 };
 
-exports.list_all_verses = function (req, res) {
+exports.list_all_verses = async function (req, res) {
 
-    Promise.all([Verse.find({songName: req.params.songName}), Song.findOne({ name: req.params.songName })])
-    .then(([verses, song]) => {
-        let result = {
-            verses: verses,
-            order: song.order,
-        }
-        res.json(result);
-})
+    let song = await Song.findById(req.params.songId);
+    let result = {
+        verses: song.verses,
+        order: song.order,
+    }
+    res.json(result);
 };
 
 exports.create_a_song = function (req, res) {
@@ -33,12 +30,12 @@ exports.create_a_song = function (req, res) {
             res.status(500).send(err);
         }
         res.json(song);
-        SocketManager.getManager().updateClients('newDataEvent', {action: 'createSong', data: new_song});
+        SocketManager.getManager().updateClients('newDataEvent', {action: 'createSong', data: song});
     });
 };
 
 exports.read_a_song = function (req, res) {
-    Song.findOne({ name: req.params.songName }, function (err, song) {
+    Song.findById(req.params.songId, function (err, song) {
         if (err) {
             res.send(err);
         }
@@ -47,7 +44,7 @@ exports.read_a_song = function (req, res) {
 };
 
 exports.update_a_song = function (req, res) {
-    Song.findOneAndUpdate({ name: req.params.songName }, req.body, { new: true }, function (err, song) {
+    Song.findByIdAndUpdate(req.params.songId, req.body, { new: true }, function (err, song) {
         if (err)
             res.send(err);
         res.json(song);
@@ -55,10 +52,8 @@ exports.update_a_song = function (req, res) {
 };
 
 exports.delete_a_song = function (req, res) {
-
-    Song.remove({
-        name: req.params.songName
-    }, function (err, song) {
+    
+    Song.findByIdAndRemove(req.params.songId, function (err, song) {
         if (err) {
             res.send(err);
         }
@@ -68,7 +63,6 @@ exports.delete_a_song = function (req, res) {
 };
 
 exports.delete_all_songs = function (req, res) {
-
     Song.remove({}, function (err, song) {
         if (err)
             res.send(err);
@@ -77,98 +71,56 @@ exports.delete_all_songs = function (req, res) {
 };
 
 exports.create_a_verse = async function(req, res) {
-    let verseId = await generateNewId("v", Verse);
-    Song.findOne({ name: req.params.songName }, function (err, song) {
+    let song = await Song.findById(req.params.songId);
+
+    let newVerse = song.verses.create({
+        text: req.body.text,
+        type: req.body.type,
+    });
+    song.verses.push(newVerse);
+
+    song.save(function(err, song) {
         if (err) {
             res.send(err);
         }
-        Song.findOneAndUpdate({ name: req.params.songName }, {
-            verses: song.verses.concat(verseId)
-            
-        }, function(err, song) {
-            if (err) {
-                res.send(err);
-            }
-
-            var newVerse = new Verse({
-                id: verseId, 
-                text: req.body.text,
-                type: req.body.type,
-                songName: req.params.songName
-            });
-            newVerse.save(function(err, verse) {
-                if (err) {
-                    res.send(err);
-                }
-                res.json(verse);
-            });
-        });
+        res.json(newVerse);
     });
 };
 
 exports.download_a_song = async function(req, res) {
-    let songName = req.params.songName;
-    let allVerses = await Verse.find({songName: songName});
+    let song = await Song.findById(req.params.songId);
+    let allVerses = song.verses;
 
     res.writeHead(200, {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'Content-disposition': 'attachment; filename=' + songName + '.pptx'
+        'Content-disposition': 'attachment; filename=' + song.title + '.pptx'
     });
 
     const exporter = new PPTXExporter();
-    await exporter.addSong(songName, allVerses);
+    await exporter.addSong(song.title, allVerses);
     await exporter.exportPPTX(res);
     
 }
 
 exports.download_songs = async function(req, res) {
-    let songNames = req.body;
+    let songIds = req.body;
 
     const exporter = new PPTXExporter();
 
-    for(let i = 0; i < songNames.length; i++) {
-        let allVerses = await Verse.find({songName: songNames[i]});
-        await exporter.addSong(songNames[i], allVerses);
+    for(let i = 0; i < songIds.length; i++) {
+        let song = await Song.findById(songIds[i]);
+        let allVerses = song.verses;
+        await exporter.addSong(song.title, allVerses);
     }
 
     res.writeHead(200, {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'Content-disposition': 'attachment; filename=' + songNames[0] + '.pptx'
+        'Content-disposition': 'attachment; filename=' + songIds[0] + '.pptx'
     });
 
     await exporter.exportPPTX(res);
 
 }
-
-exports.create_a_chorus = async function(req, res) {
-    verseId = await generateNewId("v", Verse);
-    Song.findOne({ name: req.params.songName }, function (err, song) {
-        if (err) {
-            res.send(err);
-        }
-        Song.findOneAndUpdate({ name: req.params.songName }, {
-            chorus: verseId
-            
-        }, function(err, song) {
-            if (err) {
-                res.send(err);
-            }
-
-            var newVerse = new Verse({
-                id: verseId, 
-                text: req.body.text,
-                type: req.body.type,
-                songName: req.params.songName
-            });
-            newVerse.save(function(err, verse) {
-                if (err) {
-                    res.send(err);
-                }
-                res.json(verse);
-            });
-        });
-    });
-};
 
 exports.get_all_lists = async function(req, res) {
     const songLists = await SongList.find({});
@@ -176,12 +128,12 @@ exports.get_all_lists = async function(req, res) {
 }
 
 exports.get_a_list = async function(req, res) {
-    const songList = await SongList.findOne({id: req.params.listId});
+    const songList = await SongList.findById(req.params.listId);
     res.json(songList);
 }
 
 exports.create_a_list = async function(req, res) {
-    let songListObj = {...req.body, id: await generateNewId("s", SongList)};
+    let songListObj = {...req.body};
     let newList = new SongList(songListObj);
     let list = await newList.save();
 
@@ -189,25 +141,59 @@ exports.create_a_list = async function(req, res) {
 }
 
 exports.update_a_list = async function(req, res) {
-    let newList = await SongList.findOneAndUpdate({id: req.params.listId}, {songs: req.body.songs}, { new: true });
+    let newList = await SongList.findByIdAndUpdate(req.params.listId, {songs: req.body.songs}, { new: true });
 
     res.json(newList);
 }
 
 exports.delete_a_list = async function(req, res) {
-    SongList.findOneAndRemove({id: req.params.listId}).then(
+    SongList.findByIdAndRemove(req.params.listId).then(
         res => { res.json({message: "deleted"}) },
         err => { res.send(err) }
     );
-    
 }
 
-const generateNewId = async (prefix, DBSchema, idName = "id") => {
-    let index = prefix + "00000";
-    let maxIndex = await DBSchema.findOne({}, {}, {sort: {id: -1}});
-    if(maxIndex !== null) {
-        let maxId = parseInt(maxIndex[idName].replace(prefix, ""), 10) + 1;
-        index = prefix + String('000000'+maxId).slice(-5);    
-    }
-    return index;
+exports.read_a_verse = async function (req, res) {
+    let verse = await getVerseById(req.params.songId, req.params.verseId);
+    res.json(verse);
+};
+
+exports.update_a_verse = async function (req, res) {
+    let song = await Song.findById(req.params.songId);
+    let verse =  song.verses.id(req.params.verseId);
+    verse.text = req.body.text || verse.text;
+    verse.type = req.body.type || verse.type;
+    await saveAndReturnJson(song, res);
+};
+
+exports.delete_a_verse = async function (req, res) {
+    let song = await Song.findById(req.params.songId);
+    let verse =  song.verses.id(req.params.verseId);
+
+    var newOrder = song.order.filter(verseId => {
+        return verseId !== req.params.verseId;
+    });
+
+    song.order = newOrder;
+    verse.remove();
+
+    await saveAndReturnJson(song, res);
+}; 
+
+async function getVerseById(songId, verseId) {
+    let song = await Song.findById(songId);
+    return song.verses.id(verseId);
+}
+
+async function saveAndReturnJson(object, res) {
+    return new Promise((resolve, reject) => {
+        object.save((err, objectResult) => {
+            if (err) {
+                res.send(err);
+                reject(err);
+            }
+            res.json(objectResult);
+            resolve(objectResult);
+        });
+    });
 }

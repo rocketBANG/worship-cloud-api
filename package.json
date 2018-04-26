@@ -17,7 +17,7 @@
     "decompress": "^4.2.0",
     "dotenv": "^5.0.0",
     "express": "^4.16.2",
-    "mongoose": "^4.13.6",
+    "mongoose": "^5.0.16",
     "rimraf": "^2.6.2",
     "socket.io": "^2.0.4"
   },

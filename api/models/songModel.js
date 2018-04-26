@@ -4,23 +4,19 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 
+var VerseSchema = new Schema({
+    type: {
+        type: String,
+        enum: ['verse', 'chorus'],
+        default: 'verse'
+    },
+    text: String
+})
+
 var SongSchema = new Schema({
-    name: {
-        type: String,
-        required: 'Songs need a unique name',
-        index: true,
-        unique: true
-    },
     title: String,
-    verses: {
-        type: [String],
-    },
-    order: {
-        type: [String],
-    },
-    chorus: {
-        type: String,
-    }
+    verses: [VerseSchema],
+    order: [String]
 });
 
 module.exports = mongoose.model('Songs', SongSchema);

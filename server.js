@@ -14,7 +14,7 @@ var port = process.env.PORT || 3500;
 var router = express.Router();
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL, {useMongoClient: true});
+mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL);
  
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
