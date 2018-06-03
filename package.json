@@ -14,9 +14,11 @@
     "archiver": "^2.1.1",
     "bcrypt": "^2.0.0",
     "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
     "decompress": "^4.2.0",
     "dotenv": "^5.0.0",
     "express": "^4.16.2",
+    "moment": "^2.22.2",
     "mongoose": "^5.0.16",
     "rimraf": "^2.6.2",
     "socket.io": "^2.0.4"

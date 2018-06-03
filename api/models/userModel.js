@@ -22,7 +22,8 @@ var UserSchema = new Schema({
         rightMargin: Number,
         titleMargin: Number,
         indentAmount: Number
-    }
+    },
+    sessions: [],
 });
 
 module.exports = mongoose.model('Users', UserSchema);

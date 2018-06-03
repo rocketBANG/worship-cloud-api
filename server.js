@@ -8,6 +8,7 @@ var Task = require('./api/models/models'); //created model loading here
 var bodyParser = require('body-parser');
 var socketIo = require('socket.io');
 var { SocketManager } = require('./api/SocketManager');
+const cookieParser = require('cookie-parser')
 
 var app = express();
 var port = process.env.PORT || 3500;
@@ -40,6 +41,8 @@ app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).send('Something broke!')
 });
+
+app.use(cookieParser())
 
 const uncheckedPaths = ["/login"];
 const uncheckedMethods = ["OPTIONS"];
