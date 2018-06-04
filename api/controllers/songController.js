@@ -141,7 +141,7 @@ exports.create_a_list = async function(req, res) {
 }
 
 exports.update_a_list = async function(req, res) {
-    let newList = await SongList.findByIdAndUpdate(req.params.listId, {songs: req.body.songs}, { new: true });
+    let newList = await SongList.findByIdAndUpdate(req.params.listId, {songIds: req.body.songs}, { new: true });
 
     res.json(newList);
 }
