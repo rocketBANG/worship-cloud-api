@@ -148,7 +148,7 @@ exports.update_a_list = async function(req, res) {
 
 exports.delete_a_list = async function(req, res) {
     SongList.findByIdAndRemove(req.params.listId).then(
-        res => { res.json({message: "deleted"}) },
+        () => { res.json({message: "deleted"}) },
         err => { res.send(err) }
     );
 }
