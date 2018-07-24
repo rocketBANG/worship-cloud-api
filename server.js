@@ -47,7 +47,7 @@ const uncheckedMethods = ["OPTIONS"];
 
 const UserManager = require('./api/UserManager');
 
-app.use(function(req, res, next) {
+app.use(async function(req, res, next) {
     if(uncheckedPaths.findIndex(p => req.path.startsWith(p)) > -1) {
         next();
         return;
@@ -56,11 +56,16 @@ app.use(function(req, res, next) {
         res.send();
         return;
     }
-    let user = UserManager.getObj().VerifyUser(req.headers["auth-token"]);
-    if(user === undefined) {
-        res.statusCode = 401;
-        res.send();
-        return;
+    let user = await UserManager.getObj().VerifyUser(req.headers["auth-token"]);
+    if(user === null) {
+        let loginCookie = req.cookies.worship_login;
+        let token = loginCookie && loginCookie.split('|')[0];    
+        user = await UserManager.getObj().VerifyUser(token);
+        if(user === null) {
+            res.statusCode = 401;
+            res.send();
+            return;    
+        }
     }
     next();
 });
