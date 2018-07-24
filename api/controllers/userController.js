@@ -13,15 +13,14 @@ exports.getSettings = function(req, res) {
 
 exports.loginCookie = async function(req, res) {
     let loginCooke = req.cookies.worship_login;
-    console.log(req.cookies);
+
     let username = loginCooke && loginCooke.split('|')[1];
     let token = loginCooke && loginCooke.split('|')[0];
 
-    const user = await Users.findOne({username: username});
-    let correct = user !== null && user.sessions.find(s => s.token === token);
+    const user = await UserManager.getObj().VerifyUser(token);
+    let correct = user !== null;
     
     if(correct) {
-        UserManager.getObj().AddUser(token, user.username);
         res.json({key: token, username: username, success: true});
     } else {
         res.json({success: false});
@@ -30,17 +29,23 @@ exports.loginCookie = async function(req, res) {
 
 exports.loginUser = async function(req, res) {
     const user = await Users.findOne({username: req.params.username});
+    if(!user.password) {
+        res.statusCode = 400;
+        res.send();
+        return;
+    }
+
     let correct = user !== null && await bcrypt.compare(req.body.password, user.password);
     
     if(correct) {
         let token = await bcrypt.hash(new Date().toUTCString() + user.username + "key", 10);
         UserManager.getObj().AddUser(token, user.username);
-        user.sessions = user.sessions || [];
-        user.sessions = [...user.sessions, {
-            expires: moment().add(21, "days"),
-            token: token
-        }];
-        await user.save();
+        // user.sessions = user.sessions || [];
+        // user.sessions = [...user.sessions, {
+        //     expires: moment().add(21, "days"),
+        //     token: token
+        // }];
+        // await user.save();
         res.cookie('worship_login', token + '|' + user.username, { maxAge: 1814000, httpOnly: true });
         res.json({key: token, success: true});
     } else {

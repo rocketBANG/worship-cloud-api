@@ -1,5 +1,3 @@
-const UserManager = require('./api/UserManager');
-
 require('dotenv').load();
 var express = require('express');
 var http = require('http');
@@ -15,7 +13,7 @@ var port = process.env.PORT || 3500;
 var router = express.Router();
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL);
+mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL, {useNewUrlParser: true});
  
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -47,6 +45,8 @@ app.use(cookieParser())
 const uncheckedPaths = ["/login"];
 const uncheckedMethods = ["OPTIONS"];
 
+const UserManager = require('./api/UserManager');
+
 app.use(function(req, res, next) {
     if(uncheckedPaths.findIndex(p => req.path.startsWith(p)) > -1) {
         next();
@@ -71,6 +71,8 @@ routes(app); //register the route
 let server = app.listen(port, function () {
     console.log('Example app listening on port 3500!');
 });
+
+UserManager.getObj().Init();
 
 
 let io = socketIo().listen(server);
