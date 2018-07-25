@@ -11,4 +11,6 @@ module.exports = function (app) {
     app.route(baseUrl + '/logincookie')
         .post(userController.loginCookie)
         // .patch(userController.updatePass);
+    app.route(baseUrl + '/logout')
+        .post(userController.logoutCookie);
 }
