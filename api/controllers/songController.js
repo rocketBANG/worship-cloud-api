@@ -5,6 +5,10 @@ const Song = require('../models/songModel');
 const SongList = mongoose.model('SongLists');
 var {SocketManager} = require('../SocketManager');
 
+exports.basic = function () {
+    return 'hi';
+}
+
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
         if (err)
