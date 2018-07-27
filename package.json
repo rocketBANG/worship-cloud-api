@@ -5,7 +5,7 @@
   "repository": {},
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon server.js"
   },
   "author": "",
@@ -27,6 +27,9 @@
     "socket.io": "^2.0.4"
   },
   "devDependencies": {
+    "fs": "^0.0.1-security",
+    "jest": "^23.4.2",
+    "mongodb-memory-server": "^1.9.1",
     "nodemon": "^1.17.2"
   }
 }
