@@ -82,6 +82,7 @@ exports.create_a_verse = async function(req, res) {
     song.save(function(err, song) {
         if (err) {
             res.send(err);
+            return;
         }
         res.json(newVerse);
     });
