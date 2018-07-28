@@ -7,15 +7,51 @@ var bodyParser = require('body-parser');
 var socketIo = require('socket.io');
 var { SocketManager } = require('./api/SocketManager');
 // const cookieParser = require('cookie-parser')
-var session = require('cookie-session')
-const cookies = require('cookies')
+var session = require('express-session')
 
 var app = express();
 var port = process.env.PORT || 3500;
 var router = express.Router();
 
+var MongoDBStore = require('connect-mongodb-session')(session);
+ 
+var store = new MongoDBStore({
+  uri: 'mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL + '/session' + process.env.DBARGS ,
+  collection: 'mySessions'
+});
+ 
+store.on('connected', function() {
+  store.client; // The underlying MongoClient object from the MongoDB driver
+});
+ 
+// Catch errors
+store.on('error', function(error) {
+  assert.ifError(error);
+  assert.ok(false);
+});
+
+
+var app = express()
+var sess = {
+    secret: 'verysecretWorshipCloud',
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7  // 1 week
+    },
+    store: store,
+    resave: false,
+    saveUninitialized: true
+}
+
+if (app.get('env') === 'production') {
+    app.set('trust proxy', 1) // trust first proxy
+    sess.cookie.secure = true // serve secure cookies
+}
+
+app.use(session(sess))
+
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL, { useNewUrlParser: true });
+mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL + '/' + process.env.DBCOLLECTION + process.env.DBARGS, 
+{ useNewUrlParser: true });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -56,8 +92,6 @@ app.use(function (err, req, res, next) {
 //     }
 // }))
 
-app.use(cookies.express());
-
 const uncheckedPaths = ["/login"];
 const uncheckedMethods = ["OPTIONS"];
 
@@ -75,7 +109,7 @@ app.use(async function (req, res, next) {
     }
     let user = await UserManager.getObj().VerifyUser(req.headers["auth-token"]);
     if (user === null) {
-        let loginCookie = req.cookies.get('worship_login');
+        let loginCookie = req.session.worship_login;
         let token = loginCookie && loginCookie.split('|')[0];
         user = await UserManager.getObj().VerifyUser(token);
         if (user === null) {

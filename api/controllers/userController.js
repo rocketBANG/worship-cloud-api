@@ -3,7 +3,6 @@ var Users = mongoose.model('Users');
 const bcrypt = require('bcryptjs');
 const UserManager = require('../UserManager');
 const moment = require('moment');
-const cookies = require('cookies')
 
 exports.getSettings = function(req, res) {
     Users.find({username: req.params.username}, (err, user) => {
@@ -13,7 +12,7 @@ exports.getSettings = function(req, res) {
 }
 
 exports.loginCookie = async function(req, res) {
-    let loginCooke = req.cookies.get('worship_login');
+    let loginCooke = req.session.worship_login;
 
     let username = loginCooke && loginCooke.split('|')[1];
     let token = loginCooke && loginCooke.split('|')[0];
@@ -29,9 +28,8 @@ exports.loginCookie = async function(req, res) {
 }
 
 exports.logoutCookie = async function(req, res) {
-    let loginCooke = req.cookies.get('worship_login');
-    let useSecure = process.env.SECURE === undefined || process.env.SECURE !== 'false';
-    res.cookies.set('worship_login', '', { maxAge: 1814000, httpOnly: true, secure: useSecure });
+    let loginCooke = req.session.worship_login;
+    req.session.worship_login = '';
 
     res.json({success: true});
 
@@ -57,8 +55,7 @@ exports.loginUser = async function(req, res) {
         //     token: token
         // }];
         // await user.save();
-        let useSecure = process.env.SECURE === undefined || process.env.SECURE !== 'false';
-        res.cookies.set('worship_login', token + '|' + user.username, { maxAge: 1814000, httpOnly: true, secure: useSecure });
+        req.session.worship_login = token + '|' + user.username;
         res.json({key: token, success: true});
     } else {
         res.json({success: false});
