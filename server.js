@@ -62,9 +62,10 @@ const uncheckedPaths = ["/login"];
 const uncheckedMethods = ["OPTIONS"];
 
 const UserManager = require('./api/UserManager');
+let baseUrl = process.env.BASE_URL || '';
 
 app.use(async function (req, res, next) {
-    if (uncheckedPaths.findIndex(p => req.path.startsWith(p)) > -1) {
+    if (uncheckedPaths.findIndex(p => req.path.startsWith(baseUrl + p)) > -1) {
         next();
         return;
     }
@@ -79,7 +80,7 @@ app.use(async function (req, res, next) {
         user = await UserManager.getObj().VerifyUser(token);
         if (user === null) {
             res.statusCode = 401;
-            res.send();
+            res.json();
             return;
         }
     }

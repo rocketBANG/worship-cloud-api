@@ -40,7 +40,7 @@ exports.logoutCookie = async function(req, res) {
 
 exports.loginUser = async function(req, res) {
     const user = await Users.findOne({username: req.params.username});
-    if(!user.password) {
+    if(!user || !user.password) {
         res.statusCode = 400;
         res.send();
         return;
