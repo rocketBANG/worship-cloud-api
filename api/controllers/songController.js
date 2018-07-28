@@ -5,10 +5,6 @@ const Song = require('../models/songModel');
 const SongList = mongoose.model('SongLists');
 var {SocketManager} = require('../SocketManager');
 
-exports.basic = function () {
-    return 'hi';
-}
-
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
         if (err)
@@ -29,6 +25,7 @@ exports.list_all_verses = async function (req, res) {
 
 exports.create_a_song = function (req, res) {
     var new_song = new Song(req.body);
+    console.log(new_song)
     new_song.save(function (err, song) {
         if (err) {
             res.status(500).send(err);
