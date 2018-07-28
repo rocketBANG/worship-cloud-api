@@ -1,7 +1,9 @@
-# About
+# Worship Cloud API ![build_status](https://travis-ci.com/rocketBANG/worship-cloud-api.svg?token=1evRgsqMVaUyaUvXTSsQ&branch=master)
+
+## About
 This is the backend to be used with the [WorshipCloud](https://github.com/rocketBANG/worship-cloud) web app.
 
-# Setup
+## Setup
 You will need a MongoDb (either running locally or remotely  
 
 Create files `.env.production` and `.env` with the following lines
@@ -23,7 +25,7 @@ DBURL=
 `.env.production` Handles what config the program uses in a production enviroment  
 `.env` Handles what the program uses in a dev enviroment
 
-# Running
+## Running
 Run the command `npm start`  
 This will start a localhost server at port `3500`.  
 Changing files will cause the server to reload automatically with the new changes
