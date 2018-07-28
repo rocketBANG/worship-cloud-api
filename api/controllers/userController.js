@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Users = mongoose.model('Users');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const UserManager = require('../UserManager');
 const moment = require('moment');
 const cookies = require('cookies')
