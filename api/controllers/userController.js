@@ -6,7 +6,7 @@ const moment = require('moment');
 
 exports.getSettings = function(req, res) {
     Users.find({username: req.params.username}, (err, user) => {
-        if(err) res.send(err);
+        if(err) res.json(err);
         res.json(user);
     })
 }
@@ -40,7 +40,7 @@ exports.loginUser = async function(req, res) {
     const user = await Users.findOne({username: req.params.username});
     if(!user || !user.password) {
         res.statusCode = 400;
-        res.send();
+        res.json();
         return;
     }
 
@@ -79,7 +79,7 @@ exports.patchSettings = async function(req, res) {
     let user = await Users.findOne({username: req.params.username});
     Users.findOneAndUpdate({ username: req.params.username },
         {settings: req.body}, { new: true }, (err, song) => {
-        if (err) res.send(err);
+        if (err) res.json(err);
         res.json(song);
     });
 }

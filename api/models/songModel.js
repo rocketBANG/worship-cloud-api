@@ -10,13 +10,26 @@ var VerseSchema = new Schema({
         enum: ['verse', 'chorus'],
         default: 'verse'
     },
-    text: String
+    text: {
+        type: String,
+        default: ''
+    }
 })
 
 var SongSchema = new Schema({
-    title: String,
-    verses: [VerseSchema],
-    order: [String]
+    title: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    verses: {
+        type: [VerseSchema],
+        default: []
+    },
+    order: {
+        type: [String],
+        default: []
+    }
 });
 
 module.exports = mongoose.model('Songs', SongSchema);

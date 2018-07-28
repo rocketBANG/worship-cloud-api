@@ -29,19 +29,13 @@ afterAll(async () => {
 });
 
 class MockRes {
-    constructor(jsonFunc, sendFunc, statusFunc) {
-        this.sendFunc = sendFunc;
+    constructor(jsonFunc, statusFunc) {
         this.jsonFunc = jsonFunc;
         this.statusFunc = statusFunc;
     }
 
     status(code) {
         this.statusFunc && this.statusFunc(code);
-        return this;
-    }
-
-    send(obj) {
-        this.sendFunc && this.sendFunc(obj);
         return this;
     }
 
@@ -63,6 +57,20 @@ describe('Add song', () => {
         await Promise.all(promises);
     })
 
+    const checkSong = (song, songTitle, verseLength) => {
+        expect(song._id).toBeDefined();
+        expect(song.title).toBe(songTitle);
+        expect(song.verses).toHaveLength(verseLength);
+        expect(song.order).toHaveLength(0);
+        return;
+    }
+
+    const checkVerse = (verse, verseType, verseText) => {
+        expect(verse._id).toBeDefined();
+        expect(verse.type).toBe(verseType);
+        expect(verse.text).toBe(verseText);
+    }
+
     test('create_a_song single', async done => {    
         var req = {
             body: {
@@ -74,10 +82,7 @@ describe('Add song', () => {
     
         await new Promise(resolve => {
             let createSucess = (song) => {
-                expect(song._id).toBeDefined();
-                expect(song.title).toBe(req.body.title);
-                expect(song.verses).toHaveLength(0);
-                expect(song.order).toHaveLength(0);
+                checkSong(song, req.body.title, 0);
                 resolve();
             }
             songController.create_a_song(req, new MockRes(createSucess));    
@@ -90,6 +95,74 @@ describe('Add song', () => {
         songController.list_all_songs({}, new MockRes(listSucess));
     })
 
+    test('create_a_song with a verse', done => {    
+        var req = {
+            body: {
+                title: 'SongTitle',
+                verses: [{
+                    type: 'verse',
+                    text: 'hello there'
+                }],
+                order: []
+            }
+        }
+    
+        let createSucess = (song) => {
+            checkSong(song, req.body.title, 1);
+            checkVerse(song.verses[0], req.body.verses[0].type, req.body.verses[0].text);
+            done();
+        }
+        songController.create_a_song(req, new MockRes(createSucess));    
+    })
+
+    test('create_a_song with multiple verses', done => {    
+        var req = {
+            body: {
+                title: 'SongTitle',
+                verses: [
+                {
+                    type: 'verse',
+                    text: 'hello there'
+                }, 
+                {
+                    type: 'chorus',
+                    text: 'two\nlines'
+                }],
+                order: []
+            }
+        }
+    
+        let createSucess = (song) => {
+            checkSong(song, req.body.title, 2);
+            checkVerse(song.verses[0], req.body.verses[0].type, req.body.verses[0].text);
+            checkVerse(song.verses[1], req.body.verses[1].type, req.body.verses[1].text);
+            done();
+        }
+        songController.create_a_song(req, new MockRes(createSucess));    
+    })
+
+    test('create_a_song with empty verses', done => {    
+        var req = {
+            body: {
+                title: 'SongTitle',
+                verses: [
+                {
+                }, 
+                {
+                }],
+                order: []
+            }
+        }
+    
+        let createSucess = (song) => {
+            checkSong(song, req.body.title, 2);
+            checkVerse(song.verses[0], 'verse', '');
+            checkVerse(song.verses[1], 'verse', '');
+            done();
+        }
+        songController.create_a_song(req, new MockRes(createSucess));    
+    })
+
     test('create_a_song same name', async done => {    
         var req = {
             body: {
@@ -100,12 +173,18 @@ describe('Add song', () => {
         }
     
         await new Promise(resolve => {
-            let createSucess = () => { resolve(); }
+            let createSucess = (song) => { 
+                checkSong(song, req.body.title, 0);
+                resolve(); 
+            }
             songController.create_a_song(req, new MockRes(createSucess));    
         })
 
         await new Promise(resolve => {
-            let createSucess = () => { resolve(); }
+            let createSucess = (song) => { 
+                checkSong(song, req.body.title, 0);
+                resolve(); 
+            }
             songController.create_a_song(req, new MockRes(createSucess));    
         })
     
@@ -128,14 +207,83 @@ describe('Add song', () => {
             expect(code).toBe(500);
             done();
         }
-        let json = () => { fail(); done() }
-        songController.create_a_song(req, new MockRes(json, json, status));    
+        songController.create_a_song(req, new MockRes(undefined, status));    
+    })
 
-        // listSucess = (list) => {
-        //     expect(list).toHaveLength(2);
-        //     done();
-        // }
-        // songController.list_all_songs({}, new MockRes(listSucess));
+    test('create_a_song no verses', done => {    
+        var req = {
+            body: {
+                title: 'Test Song',
+                order: []
+            }
+        }
+    
+        let status = (code) => { 
+            if(code % 100 !== 2) {
+                fail();
+                done();    
+            }
+        }
+        let json = (song) => { 
+            checkSong(song, req.body.title, 0);
+            done();
+        }
+        songController.create_a_song(req, new MockRes(json, status));    
+    })
+
+    test('create_a_song no order', done => {    
+        var req = {
+            body: {
+                title: 'S',
+                verses: [],
+            }
+        }
+    
+        let status = (code) => { 
+            if(code % 100 !== 2) {
+                fail();
+                done();    
+            }
+        }
+        let json = (song) => { 
+            checkSong(song, req.body.title, 0);
+            done();
+        }
+        songController.create_a_song(req, new MockRes(json, status));    
+    })
+
+    test('create_a_song only title', done => {    
+        var req = {
+            body: {
+                title: 'S'
+            }
+        }
+    
+        let status = (code) => { 
+            if(code % 100 !== 2) {
+                fail();
+                done();    
+            }
+        }
+        let json = (song) => { 
+            checkSong(song, req.body.title, 0);
+            done();
+        }
+        songController.create_a_song(req, new MockRes(json, status));    
+    })
+
+    test('create_a_song empty title', done => {    
+        var req = {
+            body: {
+                title: ''
+            }
+        }
+    
+        let status = (code) => { 
+            expect(code).toBe(500);
+            done();
+        }
+        songController.create_a_song(req, new MockRes(undefined, status));    
     })
 
     

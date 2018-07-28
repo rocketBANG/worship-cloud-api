@@ -75,7 +75,7 @@ app.use(function (req, res, next) {
 
 app.use(function (err, req, res, next) {
     console.error(err.stack);
-    res.status(500).send('Something broke!')
+    res.status(500).json('Something broke!')
 });
 
 // app.use(cookieParser())
@@ -104,7 +104,7 @@ app.use(async function (req, res, next) {
         return;
     }
     if (req.method === "OPTIONS") {
-        res.send();
+        res.json();
         return;
     }
     let user = await UserManager.getObj().VerifyUser(req.headers["auth-token"]);

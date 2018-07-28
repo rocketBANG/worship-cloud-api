@@ -8,7 +8,7 @@ var {SocketManager} = require('../SocketManager');
 exports.list_all_songs = function (req, res) {
     Song.find({}, function (err, song) {
         if (err)
-            res.send(err);
+            res.json(err);
         res.json(song);
     });
 };
@@ -25,10 +25,9 @@ exports.list_all_verses = async function (req, res) {
 
 exports.create_a_song = function (req, res) {
     var new_song = new Song(req.body);
-    console.log(new_song)
     new_song.save(function (err, song) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).json(err);
         }
         res.json(song);
         SocketManager.getManager().updateClients('newDataEvent', {action: 'createSong', data: song});
@@ -38,7 +37,7 @@ exports.create_a_song = function (req, res) {
 exports.read_a_song = function (req, res) {
     Song.findById(req.params.songId, function (err, song) {
         if (err) {
-            res.send(err);
+            res.json(err);
         }
         res.json(song);
     });
@@ -47,7 +46,7 @@ exports.read_a_song = function (req, res) {
 exports.update_a_song = function (req, res) {
     Song.findByIdAndUpdate(req.params.songId, req.body, { new: true }, function (err, song) {
         if (err)
-            res.send(err);
+            res.json(err);
         res.json(song);
     });
 };
@@ -56,7 +55,7 @@ exports.delete_a_song = function (req, res) {
     
     Song.findByIdAndRemove(req.params.songId, function (err, song) {
         if (err) {
-            res.send(err);
+            res.json(err);
         }
         res.json({ message: 'Song successfully deleted' });
         SocketManager.getManager().updateClients('newDataEvent', {action: 'removeSong', data: {name: req.params.songName}});
@@ -66,7 +65,7 @@ exports.delete_a_song = function (req, res) {
 exports.delete_all_songs = function (req, res) {
     Song.remove({}, function (err, song) {
         if (err)
-            res.send(err);
+            res.json(err);
         res.json({ message: 'Song successfully deleted' });
     });
 };
@@ -82,7 +81,7 @@ exports.create_a_verse = async function(req, res) {
 
     song.save(function(err, song) {
         if (err) {
-            res.send(err);
+            res.json(err);
             return;
         }
         res.json(newVerse);
@@ -151,7 +150,7 @@ exports.update_a_list = async function(req, res) {
 exports.delete_a_list = async function(req, res) {
     SongList.findByIdAndRemove(req.params.listId).then(
         () => { res.json({message: "deleted"}) },
-        err => { res.send(err) }
+        err => { res.json(err) }
     );
 }
 
@@ -191,7 +190,7 @@ async function saveAndReturnJson(object, res) {
     return new Promise((resolve, reject) => {
         object.save((err, objectResult) => {
             if (err) {
-                res.send(err);
+                res.json(err);
                 reject(err);
             }
             res.json(objectResult);
