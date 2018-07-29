@@ -1,5 +1,5 @@
-require('../models/models'); //created model loading here
-const songController = require('./songController');
+require('../../models/models'); //created model loading here
+const songController = require('../../controllers/songController');
 const mongoose = require('mongoose')
 
 beforeAll(async () => {
