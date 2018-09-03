@@ -35,7 +35,7 @@ var app = express()
 var sess = {
     secret: 'verysecretWorshipCloud',
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7  // 1 week
+        maxAge: 1000 * 60 * 60 * 24 * 30  // 30 Days
     },
     store: store,
     resave: false,
