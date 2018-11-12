@@ -399,8 +399,6 @@ describe('list_all_songs', () => {
             expect(songs).toHaveLength(1);
             expect(songs[0]._id).toEqual(song._id);
             expect(songs[0].title).toEqual('Song Title');
-            expect(songs[0].verses).toHaveLength(0);
-            expect(songs[0].order).toHaveLength(0);
             done();
         }
     

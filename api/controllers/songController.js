@@ -6,10 +6,14 @@ const SongList = mongoose.model('SongLists');
 var {SocketManager} = require('../SocketManager');
 
 exports.list_all_songs = function (req, res) {
-    Song.find({}, function (err, song) {
-        if (err)
+    Song.find({}, function (err, songs) {
+        if (err) {
             res.json(err);
-        res.json(song);
+        }
+        
+        let songList = [];
+        songs.forEach(s => songList.push({_id: s._id, title: s.title}));
+        res.json(songList);
     });
 };
 
