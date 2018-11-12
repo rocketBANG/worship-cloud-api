@@ -51,8 +51,14 @@ app.use(session(sess))
 
 mongoose.Promise = global.Promise;
 mongoose.set('useCreateIndex', true);
-mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL + '/' + process.env.DBCOLLECTION + process.env.DBARGS, 
-{ useNewUrlParser: true });
+mongoose.connect('mongodb://' + 
+    process.env.DBUSER + 
+    (process.env.DBUSER && ':') + 
+    process.env.DBPASS + '@' + 
+    process.env.DBURL + '/' + 
+    process.env.DBCOLLECTION + 
+    process.env.DBARGS, 
+    { useNewUrlParser: true });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -78,20 +84,6 @@ app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).json('Something broke!')
 });
-
-// app.use(cookieParser())
-// var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
-// app.use(session({
-//     name: 'session',
-//     keys: ['key1', 'key2'],
-//     cookie: {
-//         secure: true,
-//         httpOnly: true,
-//         domain: 'example.com',
-//         path: 'foo/bar',
-//         expires: expiryDate
-//     }
-// }))
 
 const uncheckedPaths = ["/login"];
 const uncheckedMethods = ["OPTIONS"];
