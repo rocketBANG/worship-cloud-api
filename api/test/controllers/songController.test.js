@@ -1,6 +1,7 @@
 require('../../models/models'); //created model loading here
 const songController = require('../../controllers/songController');
 const mongoose = require('mongoose')
+const Song = require('../../models/songModel');
 
 beforeAll(async () => {
     let mongoUri = global.__MONGO_URI__;
@@ -45,17 +46,17 @@ class MockRes {
     }
 }
 
+beforeEach(async () => {
+    let promises = [];
+    for(var model in mongoose.models) {
+        promises.push(mongoose.models[model].remove({}));
+    }
+    await Promise.all(promises);
+})
+
 jest.setTimeout(10000)
 
 describe('Add song', () => {
-
-    beforeEach(async () => {
-        let promises = [];
-        for(var model in mongoose.models) {
-            promises.push(mongoose.models[model].remove({}));
-        }
-        await Promise.all(promises);
-    })
 
     const checkSong = (song, songTitle, verseLength) => {
         expect(song._id).toBeDefined();
@@ -288,3 +289,149 @@ describe('Add song', () => {
 
     
 })
+
+describe('delete_a_song', () => {
+
+    test('delete_a_song success', async done => {
+        var createReq = {
+            body: {
+                title: 'SongTitle',
+                verses: [],
+                order: []
+            }
+        }
+
+        var songId;
+    
+        await new Promise(resolve => {
+            let createSucess = (song) => {
+                songId = song._id;
+                resolve();
+            }
+            songController.create_a_song(createReq, new MockRes(createSucess));    
+        })
+
+        var deleteReq = {
+            params: {
+                songId: songId
+            }
+        }
+
+        let status = (code) => { 
+            if(code !== 204) {
+                fail('return code should be 204');
+                done();
+            }
+        
+            expect(Song.findById(songId, ((err, res) => {
+                if(err) 
+                    fail('should not find song');
+            })));
+            done();
+        }
+    
+        let json = (songs) => { 
+            fail();
+            done();
+        }
+    
+        songController.delete_a_song(deleteReq, new MockRes(json, status));    
+    });
+
+    test('delete_a_song doesn\'t exist', async done => {
+
+        var deleteReq = {
+            params: {
+                songId: '1235'
+            }
+        }
+
+        let status = (code) => { 
+            if(code !== 404) {
+                fail('return code should be 404');
+                done();
+            }
+            done();
+        }
+    
+        let json = () => { 
+            // done();
+        }
+    
+        songController.delete_a_song(deleteReq, new MockRes(json, status));    
+    });
+
+})
+
+describe('list_all_songs', () => {
+    test('list_all_songs empty', done => {
+        var req = {}
+
+        let status = (code) => { 
+            if(code !== 200) {
+                fail();
+                done();
+            }
+        }
+    
+        let json = (songs) => { 
+            expect(songs).toHaveLength(0);
+            done();
+        }
+    
+        songController.list_all_songs(req, new MockRes(json, status));    
+    });
+
+    test('list_all_songs single', async done => {
+        var req = {}
+
+        let song = new Song({title: 'Song Title', verses: [], order: []});
+        song = await song.save();
+
+        let status = (code) => { 
+            if(code !== 200) {
+                fail();
+                done();
+            }
+        }
+    
+        let json = (songs) => { 
+            expect(songs).toHaveLength(1);
+            expect(songs[0]._id).toEqual(song._id);
+            expect(songs[0].title).toEqual('Song Title');
+            expect(songs[0].verses).toHaveLength(0);
+            expect(songs[0].order).toHaveLength(0);
+            done();
+        }
+    
+        songController.list_all_songs(req, new MockRes(json, status));    
+    });
+
+    test('list_all_songs many', async done => {
+        var req = {}
+
+        let songIds = [];
+        for (let i = 0; i < 100; i++) {
+            let song = new Song({title: 'Song Title' + i, verses: [], order: []});
+            songIds.push((await song.save())._id);
+        }
+
+        let status = (code) => { 
+            if(code !== 200) {
+                fail();
+                done();
+            }
+        }
+    
+        let json = (songs) => { 
+            expect(songs).toHaveLength(100);
+            for(let i = 0; i < 100; i++) {
+                expect(songs[i]._id).toEqual(songIds[i]._id);
+                expect(songs[i].title).toEqual('Song Title' + i);
+            }
+            done();
+        }
+    
+        songController.list_all_songs(req, new MockRes(json, status));    
+    });
+});

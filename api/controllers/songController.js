@@ -55,9 +55,12 @@ exports.delete_a_song = function (req, res) {
     
     Song.findByIdAndRemove(req.params.songId, function (err, song) {
         if (err) {
+            res.status(404);
             res.json(err);
+            return;
         }
-        res.json({ message: 'Song successfully deleted' });
+
+        res.status(204);
         SocketManager.getManager().updateClients('newDataEvent', {action: 'removeSong', data: {name: req.params.songName}});
     });
 };
