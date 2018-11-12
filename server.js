@@ -50,6 +50,7 @@ if (app.get('env') === 'production') {
 app.use(session(sess))
 
 mongoose.Promise = global.Promise;
+mongoose.set('useCreateIndex', true);
 mongoose.connect('mongodb://' + process.env.DBUSER + (process.env.DBUSER && ':') + process.env.DBPASS + '@' + process.env.DBURL + '/' + process.env.DBCOLLECTION + process.env.DBARGS, 
 { useNewUrlParser: true });
 

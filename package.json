@@ -21,7 +21,7 @@
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "moment": "^2.22.2",
-    "mongoose": "^5.0.16",
+    "mongoose": "^5.3.11",
     "rimraf": "^2.6.2",
     "socket.io": "^2.0.4"
   },
