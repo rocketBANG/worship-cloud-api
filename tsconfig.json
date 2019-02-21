@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist/",
+      "noImplicitAny": false,
+      "module": "umd",
+      "moduleResolution": "node",
+      "target": "es6",
+      "jsx": "react",
+      "allowJs": true,
+      "sourceMap": true,
+      "esModuleInterop": true,
+      "lib": ["es2018", "dom"],
+      "plugins": [
+        { "name": "typescript-tslint-plugin" }
+      ],
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+    },
+    "exclude": ["node_modules"],
+    "include": ["api/**/*.ts", "api/**/*.tsx", "api/**/*.js"]
+  }
+  

@@ -1,0 +1,33 @@
+{
+    "defaultSeverity": "error",
+    "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+    "linterOptions": {
+        "exclude": [
+          "config/**/*.js",
+          "node_modules/**/*.ts"
+        ]
+    },
+    "jsRules": {},
+    "rules": {
+        "no-console": { "severity": "warn" },
+        "triple-equals": true,
+        "trailing-comma": [
+            true,
+            {
+              "multiline": "always"
+            }
+        ],  
+        "semicolon": [ true, "always" ],
+        "quotemark": [ true, "double", "avoid-escape", "avoid-template" ],
+        "prefer-const": true,
+        "no-var-keyword": true,
+        "ordered-imports": true,
+        "no-duplicate-imports": true,
+        "no-trailing-whitespace": true,
+        "no-consecutive-blank-lines": true,
+        "member-access": [ true, "check-constructor", "check-accessor" ],
+        "indent": [ true, "spaces", 4 ],
+        "comment-format": [ true, "check-space" ],
+        "object-literal-sort-keys": false,
+    }
+}

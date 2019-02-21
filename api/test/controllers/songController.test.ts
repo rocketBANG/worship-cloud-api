@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const Song = require('../../models/songModel');
 
 beforeAll(async () => {
-    let mongoUri = global.__MONGO_URI__;
+    let mongoUri = (<any>global).__MONGO_URI__;
 
     mongoose.Promise = Promise;
     const mongooseOpts = { // options for mongoose 4.11.3 and above
@@ -30,7 +30,10 @@ afterAll(async () => {
 });
 
 class MockRes {
-    constructor(jsonFunc, statusFunc) {
+    jsonFunc: any;
+    statusFunc: any;
+
+    constructor(jsonFunc, statusFunc?) {
         this.jsonFunc = jsonFunc;
         this.statusFunc = statusFunc;
     }
@@ -73,7 +76,7 @@ describe('Add song', () => {
     }
 
     test('create_a_song single', async done => {    
-        var req = {
+        const req = {
             body: {
                 title: 'SongTitle',
                 verses: [],
@@ -89,7 +92,7 @@ describe('Add song', () => {
             songController.create_a_song(req, new MockRes(createSucess));    
         })
     
-        listSucess = (list) => {
+        const listSucess = (list) => {
             expect(list).toHaveLength(1);
             done();
         }
@@ -189,7 +192,7 @@ describe('Add song', () => {
             songController.create_a_song(req, new MockRes(createSucess));    
         })
     
-        listSucess = (list) => {
+        const listSucess = (list) => {
             expect(list).toHaveLength(2);
             done();
         }

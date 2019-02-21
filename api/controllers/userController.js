@@ -1,23 +1,22 @@
-var mongoose = require('mongoose');
-var Users = mongoose.model('Users');
-const bcrypt = require('bcryptjs');
-const UserManager = require('../UserManager');
-const moment = require('moment');
+import { model } from 'mongoose';
+import { compare, hash } from 'bcryptjs';
+import { getObj } from '../UserManager';
+import { UserModel } from '../models/userModel';
 
-exports.getSettings = function(req, res) {
-    Users.find({username: req.params.username}, (err, user) => {
+export function getSettings(req, res) {
+    UserModel.find({username: req.params.username, }, (err, user) => {
         if(err) res.json(err);
         res.json(user);
     })
 }
 
-exports.loginCookie = async function(req, res) {
+export async function loginCookie(req, res) {
     let loginCooke = req.session.worship_login;
 
     let username = loginCooke && loginCooke.split('|')[1];
     let token = loginCooke && loginCooke.split('|')[0];
 
-    const user = await UserManager.getObj().VerifyUser(token);
+    const user = await getObj().VerifyUser(token);
     let correct = user !== null;
     
     if(correct) {
@@ -27,7 +26,7 @@ exports.loginCookie = async function(req, res) {
     }
 }
 
-exports.logoutCookie = async function(req, res) {
+export async function logoutCookie(req, res) {
     let loginCooke = req.session.worship_login;
     req.session.worship_login = '';
 
@@ -36,19 +35,19 @@ exports.logoutCookie = async function(req, res) {
 
 }
 
-exports.loginUser = async function(req, res) {
-    const user = await Users.findOne({username: req.params.username});
+export async function loginUser(req, res) {
+    const user = await UserModel.findOne({username: req.params.username});
     if(!user || !user.password) {
         res.statusCode = 400;
         res.json();
         return;
     }
 
-    let correct = user !== null && await bcrypt.compare(req.body.password, user.password);
+    let correct = user !== null && await compare(req.body.password, user.password);
     
     if(correct) {
-        let token = await bcrypt.hash(new Date().toUTCString() + user.username + "key", 10);
-        UserManager.getObj().AddUser(token, user.username);
+        let token = await hash(new Date().toUTCString() + user.username + "key", 10);
+        getObj().AddUser(token, user.username);
         // user.sessions = user.sessions || [];
         // user.sessions = [...user.sessions, {
         //     expires: moment().add(21, "days"),
@@ -62,9 +61,9 @@ exports.loginUser = async function(req, res) {
     }
 }
 
-exports.updatePass = async function(req, res) {
-    const user = await Users.findOne({username: req.params.username});
-    let pass = await bcrypt.hash(req.body.password, 10);
+export async function updatePass(req, res) {
+    const user = await UserModel.findOne({username: req.params.username});
+    let pass = await hash(req.body.password, 10);
     user.password = pass;
     let saved = await user.save();
     
@@ -75,9 +74,9 @@ exports.updatePass = async function(req, res) {
     }
 }
 
-exports.patchSettings = async function(req, res) {
-    let user = await Users.findOne({username: req.params.username});
-    Users.findOneAndUpdate({ username: req.params.username },
+export async function patchSettings(req, res) {
+    let user = await UserModel.findOne({username: req.params.username});
+    UserModel.findOneAndUpdate({ username: req.params.username },
         {settings: req.body}, { new: true }, (err, song) => {
         if (err) res.json(err);
         res.json(song);

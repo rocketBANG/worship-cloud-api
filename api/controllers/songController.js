@@ -1,11 +1,11 @@
 const { PPTXExporter } = require('../pptx/pptxExporter');
 
-var mongoose = require('mongoose');
-const Song = require('../models/songModel');
-const SongList = mongoose.model('SongLists');
+const mongoose = require('mongoose');
 var {SocketManager} = require('../SocketManager');
 
 exports.list_all_songs = function (req, res) {
+    const Song = require('../models/songModel');
+
     Song.find({}, function (err, songs) {
         if (err) {
             res.json(err);
@@ -18,6 +18,7 @@ exports.list_all_songs = function (req, res) {
 };
 
 exports.list_all_verses = async function (req, res) {
+    const Song = require('../models/songModel');
 
     let song = await Song.findById(req.params.songId);
     let result = {
@@ -28,6 +29,8 @@ exports.list_all_verses = async function (req, res) {
 };
 
 exports.create_a_song = function (req, res) {
+    const Song = require('../models/songModel');
+
     var new_song = new Song(req.body);
     new_song.save(function (err, song) {
         if (err) {
@@ -39,6 +42,8 @@ exports.create_a_song = function (req, res) {
 };
 
 exports.read_a_song = function (req, res) {
+    const Song = require('../models/songModel');
+
     Song.findById(req.params.songId, function (err, song) {
         if (err) {
             res.json(err);
@@ -48,6 +53,8 @@ exports.read_a_song = function (req, res) {
 };
 
 exports.update_a_song = function (req, res) {
+    const Song = require('../models/songModel');
+
     Song.findByIdAndUpdate(req.params.songId, req.body, { new: true }, function (err, song) {
         if (err)
             res.json(err);
@@ -56,7 +63,8 @@ exports.update_a_song = function (req, res) {
 };
 
 exports.delete_a_song = function (req, res) {
-    
+    const Song = require('../models/songModel');
+
     Song.findByIdAndRemove(req.params.songId, function (err, song) {
         if (err) {
             res.status(404);
@@ -70,6 +78,8 @@ exports.delete_a_song = function (req, res) {
 };
 
 exports.delete_all_songs = function (req, res) {
+    const Song = require('../models/songModel');
+
     Song.remove({}, function (err, song) {
         if (err)
             res.json(err);
@@ -78,6 +88,8 @@ exports.delete_all_songs = function (req, res) {
 };
 
 exports.create_a_verse = async function(req, res) {
+    const Song = require('../models/songModel');
+
     let song = await Song.findById(req.params.songId);
 
     let newVerse = song.verses.create({
@@ -96,6 +108,8 @@ exports.create_a_verse = async function(req, res) {
 };
 
 exports.download_a_song = async function(req, res) {
+    const Song = require('../models/songModel');
+
     let song = await Song.findById(req.params.songId);
     let allVerses = song.verses;
 
@@ -111,6 +125,8 @@ exports.download_a_song = async function(req, res) {
 }
 
 exports.download_songs = async function(req, res) {
+    const Song = require('../models/songModel');
+
     let songIds = req.body;
 
     const exporter = new PPTXExporter();
@@ -131,16 +147,22 @@ exports.download_songs = async function(req, res) {
 }
 
 exports.get_all_lists = async function(req, res) {
+    const SongList = mongoose.model('SongLists');
+
     const songLists = await SongList.find({});
     res.json(songLists);
 }
 
 exports.get_a_list = async function(req, res) {
+    const SongList = mongoose.model('SongLists');
+
     const songList = await SongList.findById(req.params.listId);
     res.json(songList);
 }
 
 exports.create_a_list = async function(req, res) {
+    const SongList = mongoose.model('SongLists');
+
     let songListObj = {...req.body};
     let newList = new SongList(songListObj);
     let list = await newList.save();
@@ -149,12 +171,16 @@ exports.create_a_list = async function(req, res) {
 }
 
 exports.update_a_list = async function(req, res) {
+    const SongList = mongoose.model('SongLists');
+
     let newList = await SongList.findByIdAndUpdate(req.params.listId, {songIds: req.body.songs}, { new: true });
 
     res.json(newList);
 }
 
 exports.delete_a_list = async function(req, res) {
+    const SongList = mongoose.model('SongLists');
+
     SongList.findByIdAndRemove(req.params.listId).then(
         () => { res.json({message: "deleted"}) },
         err => { res.json(err) }
@@ -167,6 +193,8 @@ exports.read_a_verse = async function (req, res) {
 };
 
 exports.update_a_verse = async function (req, res) {
+    const Song = require('../models/songModel');
+
     let song = await Song.findById(req.params.songId);
     let verse =  song.verses.id(req.params.verseId);
     verse.text = req.body.text || verse.text;
@@ -175,6 +203,8 @@ exports.update_a_verse = async function (req, res) {
 };
 
 exports.delete_a_verse = async function (req, res) {
+    const Song = require('../models/songModel');
+
     let song = await Song.findById(req.params.songId);
     let verse =  song.verses.id(req.params.verseId);
 
@@ -189,6 +219,8 @@ exports.delete_a_verse = async function (req, res) {
 }; 
 
 async function getVerseById(songId, verseId) {
+    const Song = require('../models/songModel');
+
     let song = await Song.findById(songId);
     return song.verses.id(verseId);
 }

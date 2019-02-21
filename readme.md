@@ -26,6 +26,6 @@ DBURL=
 `.env` Handles what the program uses in a dev enviroment
 
 ## Running
-Run the command `npm start`  
+Run the command `npm start` or `npm run dev` to start a dev server  
 This will start a localhost server at port `3500`.  
-Changing files will cause the server to reload automatically with the new changes
+With a dev server, changing files will cause the server to reload automatically with the new changes
