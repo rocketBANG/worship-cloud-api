@@ -4,3 +4,4 @@ auth.json
 tmp*
 **/globalConfig.json
 coverage/
+dist/

@@ -8,7 +8,7 @@ module.exports = {
       // First application
       {
         name      : 'WorshipCloudApi',
-        script    : 'server.ts',
+        script    : 'dist/server.js',
         watch     : true,
         env: {
           COMMON_VARIABLE: 'true'

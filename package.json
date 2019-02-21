@@ -9,7 +9,8 @@
     "start": "ts-node api/server.ts",
     "dev": "nodemon -e js,ts",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
