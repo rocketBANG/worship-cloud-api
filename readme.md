@@ -4,14 +4,18 @@
 This is the backend to be used with the [WorshipCloud](https://github.com/rocketBANG/worship-cloud) web app.
 
 ## Setup
-You will need a MongoDb (either running locally or remotely  
+You will need a MongoDb (either running locally or remotely)
+
 
 Create files `.env.production` and `.env` with the following lines
 ```
 BASE_URL=
 DBUSER=
 DBPASS=
+DBARGS=
+DBCOLLECTION=
 DBURL=
+SECRET=
 ```
 `BASE_URL` is the url the api will be hosted at (e.g. `/api/v1`)  
 `DBUSER` is the username to login to the database with
@@ -19,7 +23,11 @@ DBURL=
 `DBPASS` is the password to use for the database 
     (leave blank if there is no auth)  
 `DBURL` is the hostname URL of the MongoDB to connect to
-    e.g. `localhost:27017/songs`
+    e.g. `localhost:27017`
+`DBCOLLECTION` is the collection to connect to 
+    e.g. `songs`
+`SECRET` is the secret to use for the express-session
+    e.g. `secret_token`
 
     
 `.env.production` Handles what config the program uses in a production enviroment  

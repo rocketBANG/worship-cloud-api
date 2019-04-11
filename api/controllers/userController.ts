@@ -1,7 +1,9 @@
 import { model } from 'mongoose';
 import { compare, hash } from 'bcryptjs';
 import { getObj } from '../UserManager';
-import { UserModel } from '../models/userModel';
+import { UserModel, IUser } from '../models/userModel';
+import express = require('express');
+import expressValidator = require('express-validator');
 
 export function getSettings(req, res) {
     UserModel.find({username: req.params.username, }, (err, user) => {
@@ -48,12 +50,6 @@ export async function loginUser(req, res) {
     if(correct) {
         let token = await hash(new Date().toUTCString() + user.username + "key", 10);
         getObj().AddUser(token, user.username);
-        // user.sessions = user.sessions || [];
-        // user.sessions = [...user.sessions, {
-        //     expires: moment().add(21, "days"),
-        //     token: token
-        // }];
-        // await user.save();
         req.session.worship_login = token + '|' + user.username;
         res.json({key: token, success: true});
     } else {
@@ -81,4 +77,55 @@ export async function patchSettings(req, res) {
         if (err) res.json(err);
         res.json(song);
     });
+}
+
+export async function createUser(req: express.Request, res: express.Response) {
+    req.checkBody("password", "There must be a password").notEmpty();
+    req.checkParams("username", "Username is not valid").notEmpty();
+
+    if (checkAndFormatErrors(req, res)) return;
+
+    const user = <IUser> {
+        password: await hash(req.body.password, 10),
+        sessions: [],
+        settings: generateDefaultSettings(),
+        userLevel: "0",
+        username: req.params.username,
+    }
+
+    let dbUser = new UserModel({ ...user });
+
+    try {
+        await dbUser.save();
+    } catch (error) {
+        res.status(400).json({ error: new CustomError("username", "User already exists", req.params.username) });
+        return;
+    }
+
+    res.json(true);
+}
+
+function generateDefaultSettings(): IUser["settings"] {
+    return <IUser["settings"]> {
+        // No default settings atm - use frontend definitions
+    }
+}
+
+export class CustomError {
+    constructor(public message: string, public entity?: string, public value?: string) {
+
+    }
+}
+
+export function checkAndFormatErrors(req: express.Request, res: express.Response) {
+    const errors = req.validationErrors();
+  
+    if (errors) {
+        res.status(400).json({ 
+            error: { validationErrors: errors } 
+        });
+        return true;
+    }
+
+    return false;
 }

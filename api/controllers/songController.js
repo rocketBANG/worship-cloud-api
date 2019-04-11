@@ -65,15 +65,15 @@ exports.update_a_song = function (req, res) {
 exports.delete_a_song = function (req, res) {
     const Song = require('../models/songModel');
 
-    Song.findByIdAndRemove(req.params.songId, function (err, song) {
+    Song.findByIdAndDelete(req.params.songId, function (err, song) {
         if (err) {
             res.status(404);
             res.json(err);
             return;
         }
 
-        res.status(204);
-        SocketManager.getManager().updateClients('newDataEvent', {action: 'removeSong', data: {name: req.params.songName}});
+        res.status(204).json();
+        // SocketManager.getManager().updateClients('newDataEvent', {action: 'removeSong', data: {name: req.params.songName}});
     });
 };
 
@@ -181,7 +181,7 @@ exports.update_a_list = async function(req, res) {
 exports.delete_a_list = async function(req, res) {
     const SongList = mongoose.model('SongLists');
 
-    SongList.findByIdAndRemove(req.params.listId).then(
+    SongList.findByIdAndDelete(req.params.listId).then(
         () => { res.json({message: "deleted"}) },
         err => { res.json(err) }
     );

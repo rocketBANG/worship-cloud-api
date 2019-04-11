@@ -334,7 +334,6 @@ describe('delete_a_song', () => {
         }
     
         let json = (songs) => { 
-            fail();
             done();
         }
     

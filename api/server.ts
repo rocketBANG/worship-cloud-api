@@ -7,25 +7,28 @@ import session from "express-session";
 import { connect, set } from "mongoose";
 import * as mongoose from "mongoose";
 import socketIo from "socket.io";
-import routes from "./routes/routes";
+import { routes } from "./routes/routes";
 import { SocketManager } from "./SocketManager";
 import { getObj } from "./UserManager";
+import { getEnvValue } from "./utils/EnvironmentManager"
+import expressValidator = require("express-validator");
+import { RouteAuth } from "./routes/RouteAuth";
 require('./models/models');
 
 dotenv.load();
 const app = express();
-const port = process.env.PORT || 3500;
+const port = getEnvValue("PORT") || 3500;
 const router = Router();
 
 const MongoDBStore = connectMongo(session);
 
 const store = new MongoDBStore({
   uri: "mongodb://" +
-    process.env.DBUSER +
-    (process.env.DBUSER && ":") +
-    process.env.DBPASS + "@" +
-    process.env.DBURL + "/session" +
-    process.env.DBARGS ,
+    getEnvValue("DBUSER") +
+    (getEnvValue("DBUSER") && ":") +
+    getEnvValue("DBPASS") + "@" +
+    getEnvValue("DBURL") + "/session" +
+    getEnvValue("DBARGS") ,
   collection: "mySessions",
 });
 
@@ -40,7 +43,7 @@ store.on("error", function(error) {
 });
 
 let sess: session.SessionOptions = {
-    secret: "verysecretWorshipCloud",
+    secret: getEnvValue("SECRET"),
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 30,  // 30 Days
     },
@@ -55,20 +58,21 @@ if (app.get("env") === "production") {
 }
 
 app.use(session(sess));
+app.use(expressValidator());
+app.use(urlencoded({ extended: true }));
+app.use(json());
 
 (<any>mongoose.Promise) = Promise;
 set("useCreateIndex", true);
 connect("mongodb://" +
-    process.env.DBUSER +
-    (process.env.DBUSER && ":") +
-    process.env.DBPASS + "@" +
-    process.env.DBURL + "/" +
-    process.env.DBCOLLECTION +
-    process.env.DBARGS,
+    getEnvValue("DBUSER") +
+    (getEnvValue("DBUSER") && ":") +
+    getEnvValue("DBPASS") + "@" +
+    getEnvValue("DBURL") + "/" +
+    getEnvValue("DBCOLLECTION") +
+    getEnvValue("DBARGS"),
     { useNewUrlParser: true });
 
-app.use(urlencoded({ extended: true }));
-app.use(json());
 
 const origins = ["https://worshipcloud.azurewebsites.net", "http://localhost:3000"];
 
@@ -93,33 +97,12 @@ app.use((err: any, req: express.Request, res: express.Response, next: NextFuncti
     res.status(500).json("Something broke!");
 });
 
-const uncheckedPaths = ["/login"];
+const uncheckedPaths = ["/login", "/users"];
 const uncheckedMethods = ["OPTIONS"];
 
-const baseUrl = process.env.BASE_URL || "";
+const baseUrl = getEnvValue("BASE_URL") || "";
 
-app.use(async function(req, res, next) {
-    if (uncheckedPaths.findIndex((p) => req.path.startsWith(baseUrl + p)) > -1) {
-        next();
-        return;
-    }
-    if (req.method === "OPTIONS") {
-        res.json();
-        return;
-    }
-    let user = await getObj().VerifyUser(req.headers["auth-token"]);
-    if (user === null) {
-        const loginCookie = req.session.worship_login;
-        const token = loginCookie && loginCookie.split("|")[0];
-        user = await getObj().VerifyUser(token);
-        if (user === null) {
-            res.statusCode = 401;
-            res.json();
-            return;
-        }
-    }
-    next();
-});
+app.use(RouteAuth);
 
 routes(app); // register the route
 
