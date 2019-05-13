@@ -61,7 +61,8 @@ const UserSchema = new Schema({
         leftMargin: Number,
         rightMargin: Number,
         titleMargin: Number,
-        indentAmount: Number
+        indentAmount: Number,
+        backgroundImage: String,
     },
     userLevel: String,
     sessions: [{type: Schema.Types.ObjectId, ref: 'UserSessions'}],

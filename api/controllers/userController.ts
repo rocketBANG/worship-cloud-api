@@ -73,7 +73,7 @@ export async function updatePass(req, res) {
 export async function patchSettings(req, res) {
     let user = await UserModel.findOne({username: req.params.username});
     UserModel.findOneAndUpdate({ username: req.params.username },
-        {settings: req.body}, { new: true }, (err, song) => {
+        {settings: {...user.settings, ...req.body}}, { new: true }, (err, song) => {
         if (err) res.json(err);
         res.json(song);
     });

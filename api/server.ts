@@ -60,7 +60,7 @@ if (app.get("env") === "production") {
 app.use(session(sess));
 app.use(expressValidator());
 app.use(urlencoded({ extended: true }));
-app.use(json());
+app.use(json({limit: '5mb'}));
 
 (<any>mongoose.Promise) = Promise;
 set("useCreateIndex", true);
