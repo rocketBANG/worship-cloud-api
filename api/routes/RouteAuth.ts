@@ -12,13 +12,24 @@ const verifyUser = async (req: express.Request): Promise<boolean> => {
             return false;
         }
     }
+
     return true;
+}
+
+const userLevelValidator = (userLevel: string): (req: express.Request) => Promise<boolean> => {
+    return async (req: express.Request) => {
+        const loginCookie = req.session.worship_login;
+        const token = loginCookie && loginCookie.split("|")[0];
+        const user = await getObj().VerifyUser(token);
+
+        return user && user.userLevel === userLevel;    
+    }
 }
 
 const pathAuth: IPathAuth[] = [ 
     { path: "*", validator: verifyUser },
     { path: "/login", validator: () => true }, 
-    { path: "/users/:username", method: "POST", validator: () => false } 
+    { path: "/users/:username", method: "POST", validator: userLevelValidator("admin") },
 ];
 const baseUrl = getEnvValue("BASE_URL") || "";
 

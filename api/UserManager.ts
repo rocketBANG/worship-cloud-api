@@ -42,7 +42,7 @@ class UserManager {
     }
 
     async VerifyUser(authToken: any) {
-        let userSession: any = await UserSessionModel.findOne({token: authToken});
+        let userSession = await UserSessionModel.findOne({token: authToken}).populate('user');
 
         if(userSession === null) return null;
 

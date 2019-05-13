@@ -1,7 +1,7 @@
 import express = require("express");
 import { asyncRoute } from "./routes";
 
-const userController = require('../controllers/userController');
+import * as userController from '../controllers/userController';
 const { getEnvValue } = require("../utils/EnvironmentManager");
 let baseUrl = getEnvValue("BASE_URL") || '';
 
